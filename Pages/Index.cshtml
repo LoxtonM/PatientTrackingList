@@ -11,7 +11,7 @@
             <a class="btn btn-primary btn-lg" asp-area=""
                asp-page="/Download" asp-route-consultantFilter=@Model.consultantSelected
                asp-route-gcFilter=@Model.GCSelected asp-route-pathwayFilter=@Model.pathwaySelected
-               asp-route-username=@Model.User.Identity.Name asp-route-type="ptl" asp-route-triagePathwayFilter="@Model.triagePathway" 
+               asp-route-username=@Model.User.Identity.Name asp-route-type="ptl" asp-route-triagePathwayFilter="@Model.triagePathway"
                asp-route-statusAdmin="@Model.adminStatus">Export Data</a>
         </div>
     </div>
@@ -142,49 +142,77 @@
                                 <option value="">Select...</option>
                                 @foreach (var item in Model.GCList)
                                 {
-                                    <option value=@item.NAME>@item.NAME</option>
+                                <option value=@item.NAME>@item.NAME</option>
                                 }
-                            </select>
-                        </div>
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="txtComments">Comments:</label>
-                            <input type="text" class="form-control" id="txtComments" name="commentsearch" type="text" asp-for=@Model.commentSearch>
-                        </div>
-                        <div class="mb-3 col-md-4">
-                            <label class="form-label" for="ddlTriagePathway">Triage Pathway (General only):</label>
-                            <select id="ddlTriagePathway" class="form-select" asp-for=@Model.triagePathway name="triagePathwayFilter">
-                                <option value="" defaultValue>Select...</option>
-                                @if (Model.UniqueTriagePathways != null && Model.UniqueTriagePathways.Any())
-                                {
-                                    foreach (var triagePathway in Model.UniqueTriagePathways)
+                                </select>
+                                *@
+                               
+
+                                <div class="custom-select">
+                                    <div class="select-box">
+                                        <input type="text" name="tags" class="tags_input" hidden>
+                                        <div class="selected-options">
+                                           
+                                        </div>
+                                        <div class="arrow">
+                                            <i class="fa fa-angle-down"></i>
+                                        </div>
+                                    </div>
+                                    <div class="options">
+                                        <div class="option-search-tags">
+                                            <input type="text" class="search-tags" placeholder="Search GC">
+                                            <button type="button" class="clear"><i class="fa fa-close"></i></button>
+                                        </div>
+                                        <div class="option all-tags" data-value="All">Select All</div>
+                                         @foreach (var item in Model.GCList)
+                                        {
+                                            <div class="option " data-value=@item.NAME>@item.NAME</div>
+                                        }
+                                       
+                                        <div class="option" data-value="no-result-message" style="display:none;">GC not found</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="mb-3 col-md-4">
+                                <label class="form-label" for="txtComments">Comments:</label>
+                                <input type="text" class="form-control" id="txtComments" name="commentsearch" type="text" asp-for=@Model.commentSearch>
+                            </div>
+                            <div class="mb-3 col-md-4">
+                                <label class="form-label" for="ddlTriagePathway">Triage Pathway (General only):</label>
+                                <select id="ddlTriagePathway" class="form-select" asp-for=@Model.triagePathway name="triagePathwayFilter">
+                                    <option value="" defaultValue>Select...</option>
+                                    @if (Model.UniqueTriagePathways != null && Model.UniqueTriagePathways.Any())
                                     {
-                                        <option value="@triagePathway">@triagePathway</option>
+                                        foreach (var triagePathway in Model.UniqueTriagePathways)
+                                        {
+                                            <option value="@triagePathway">@triagePathway</option>
+                                        }
                                     }
-                                }
-                            </select>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                  
-                        <div class="mb-3">
+                        <div class="row">
+
+                            <div class="mb-3">
                                 <label class="form-label" for="ddladminStatus">Admin Status:</label>
                                 <select id="ddladminStatus" class="form-select" asp-for=@Model.adminStatus name="statusAdmin">
-                                <option value="" defaultValue>Select...</option>
-                               
+                                    <option value="" defaultValue>Select...</option>
+
                                     @foreach (var item in Model.listStatusAdmin)
                                     {
                                         <option value="@item.Status_Admin">@item.Status_Admin</option>
                                     }
-                                
-                            </select>
+
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <button type="submit" class="btn btn-lg btn-outline-dark">Submit</button>
-                </form>
+                        <button type="submit" class="btn btn-lg btn-outline-dark btn_submit">Submit</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <div class="row">
         <div class="col-lg-12">
@@ -203,7 +231,7 @@
                                     <th>TCI Date</th>
                                     <th>Clock Ticking (Days)</th>
                                     <th>Clock Ticking (Weeks)</th>
-                                    <th>Clock Days at TCI</th>
+                                    <th>Clock Weeks at TCI</th>
                                     <th>Triage Pathway</th>
                                     <th>Comments</th>
                                     <th>Checked</th>
