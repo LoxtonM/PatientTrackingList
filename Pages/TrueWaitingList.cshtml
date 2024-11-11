@@ -137,7 +137,8 @@
                             <i class="fa-solid fa-sort-down fa-xl sort-down"></i>
                         </a>
                     </th>
-                    <th>View More</th>
+                    <th>ICP Data</th>
+                    <th>Appointment</th>
                 </tr>
             </thead>
             <tbody>
@@ -176,7 +177,11 @@
                                asp-route-sRefType="@item.RefType" asp-route-sRefDate="@item.RefDate" asp-route-sNhsNo="@item.NHSNo" asp-route-sConsultant="@item.LeadClinician" 
                                asp-route-sGc="@item.GC" asp-route-sAdminContact="@item.AdminContact"asp-route-sPathway="@item.PATHWAY" asp-route-sRefClass="@item.RefClass" 
                                asp-route-sIndication="@item.INDICATION" asp-route-sBreachDate="@item.BreachDate" asp-route-sIndicationNotes="@item.REASON_FOR_REFERRAL"
-                               class="btn btn-outline-primary" target="_blank">View More</a>
+                               asp-route-sClinicno="@item.CLINICNO"
+                               class="btn btn-outline-primary" target="_blank">ICP Data</a>
+                        </td>
+                        <td>
+                            <a class="btn btn-outline-primary" target="_blank" asp-route-sClinicno="@item.CLINICNO" asp-page="Appointment">Appointment</a>
                         </td>
                     </tr>
                 }
@@ -195,6 +200,7 @@
                     <th>Status Admin</th>
                     <th>Pathway </th>
                     <th>ICP Data</th>
+                    <th>Appointment</th>
                 </tr>
             </tfoot>
         </table>

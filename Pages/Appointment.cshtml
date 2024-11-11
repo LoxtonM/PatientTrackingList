@@ -1,0 +1,167 @@
+﻿@page
+@model PatientTrackingList.Pages.AppointmentModel
+@{
+}
+
+<div class="row mb-2 mb-xl-3">
+	<div class="col-auto d-none d-sm-block">
+		
+@if (Model.appointments != null)
+{
+		<h3><strong>Appointment Details for: </strong>@Model.appointments.FIRSTNAME @Model.appointments.LASTNAME</h3>
+}
+	</div>
+
+	<div class="col-auto ms-auto text-end mt-n1">
+		<a href="#" class="btn btn-primary" onclick="window.close();">Go Back</a>
+	</div>
+</div>
+
+
+
+@if (Model.appointments != null)
+{
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Appointment Details:</h5>
+            </div>
+            <div class="card-body">
+				<table class="table table-borderless my-0">
+					<tbody>
+						<tr>
+							<td>
+								<div class="d-none d-xl-table-cell">
+									<strong>CGU Number</strong>
+									<div class="text-muted">
+										@Model.appointments.CGU_No
+									</div>
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Title</strong>
+								<div class="text-muted">
+									@Model.appointments.Title
+								</div>
+							</td>
+                            <td>
+								<div class="d-none d-xl-table-cell">
+                                    <strong>Name</strong>
+                                    <div class="text-muted">
+                                        @Model.appointments.FIRSTNAME @Model.appointments.LASTNAME
+                                    </div>
+                                </div>
+							</td>
+							<td>
+								<div class="d-none d-xl-table-cell">
+                                    <strong>Family Name</strong>
+                                    <div class="text-muted">
+                                        @Model.appointments.FamilyName
+                                    </div>
+                                </div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Date of Birth</strong>
+								<div class="text-muted">
+									@Model.appointments.dob?.ToString("dd/MM/yyyy")
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Address</strong>
+								<div class="text-muted">
+									@Model.appointments.ADDRESS1 @Model.appointments.address2 @Model.appointments.address3 @Model.appointments.address4 @Model.appointments.postcode
+								</div>
+							</td>
+							
+						</tr>
+						
+						<tr>
+							<td class="d-none d-xl-table-cell">
+								<strong>Seen by clicnician</strong>
+								<div class="text-muted">
+									@Model.appointments.SeenByClinician
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Duration</strong>
+								<div class="text-muted">
+									@Model.appointments.Duration
+								</div>
+							</td><td class="d-none d-xl-table-cell">
+								<strong>Facility</strong>
+								<div class="text-muted">
+									@Model.appointments.FACILITY
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Clinic</strong>
+								<div class="text-muted">
+									@Model.appointments.Clinic
+								</div>
+							</td>
+							<td>
+								<div class="d-none d-xl-table-cell">
+									<strong>Clinician</strong>
+									<div class="text-muted">
+										@Model.appointments.Clinician
+									</div>
+								</div>
+						
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Clinic Location</strong>
+								<div class="text-muted">
+									@Model.appointments.ClinicLocation
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div class="d-none d-xl-table-cell">
+									<strong>Appointment Type</strong>
+									<div class="text-muted">
+										@Model.appointments.AppType
+									</div>
+								</div>
+
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Attendance</strong>
+								<div class="text-muted">
+									@Model.appointments.Attendance
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Cancellation Reason</strong>
+								<div class="text-muted">
+									@Model.appointments.CancellationReason
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Booked Date</strong>
+								<div class="text-muted">
+									@Model.appointments.BOOKED_DATE?.ToString("dd/MM/yyyy")
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								<strong>Booked Time</strong>
+								<div class="text-muted">
+									@Model.appointments.BOOKED_TIME?.ToShortTimeString()
+								</div>
+							</td>
+							<td class="d-none d-xl-table-cell">
+								@* <strong>Indication Notes</strong>*@
+								<div class="text-muted">
+									@*@Model.appointments.IndicationNotes*@
+								</div>
+							</td>
+
+						</tr>
+					</tbody>
+				</table>
+
+            </div>
+        </div>
+    </div>
+
+}
