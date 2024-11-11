@@ -1,0 +1,29 @@
+﻿@page
+@model PatientTrackingList.Pages.WIPModel
+@{
+}
+
+<div class="container">
+    <div>
+        <button type="button" id="btnBack" class="btn btn-outline-primary">Back</button>
+    </div>
+
+    <h1 class="text-center">Here be dragons!!!</h1>
+
+    <p class="text-center"><img src="~/Images/dragon.jpg" /></p>
+
+    <h2 class="text-center">(this page is not yet ready, please return from whence thou came)</h2>
+</div>
+
+
+<script type="text/javascript">
+
+    document.getElementById("btnBack").addEventListener("click", GoBack);
+
+
+    function GoBack() 
+    {
+        window.history.back();
+    }
+
+</script>

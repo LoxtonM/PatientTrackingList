@@ -83,63 +83,62 @@
     </div>*@
     <br />
     <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Search Form</h5>
-                </div>
-                <div class="card-body">
-                    <form id="frmMenu" method="post">
-                        <button type="button" id="btnReset" class="btn btn-dark mb-3">Reset Filters</button>
-                        <div class="row">
-                            <div class="mb-3 col-md-4">
-                                <label class="form-label" for="txtName">Name:</label>
-                                <input type="text" class="form-control" id="txtName" name="sNameSearch" placeholder="Name">
-                            </div>
-                            <div class="mb-3 col-md-4">
-                                <label class="form-label" for="txtCGU">CGU_No:</label>
-                                <input type="text" class="form-control" id="txtCGU" name="sCGUSearch" placeholder="CGU_No">
-                            </div>
-                            <div class="mb-3 col-md-4">
-                                <label class="form-label" for="inputPassword4">Priority:</label>
-                                <select class="form-select mb-3" id="ddlPriority" name="priorityFilter" asp-for=@Model.prioritySelected>
-                                    <option value="">Any</option>
-                                    <option value="Routine">Routine</option>
-                                    <option value="Fast-Track">Fast-track</option>
-                                    <option value="Urgent">Urgent</option>
-                                </select>
-                            </div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Search Form</h5>
+            </div>
+            <div class="card-body">
+                <form id="frmMenu" method="post">
+                    <button type="button" id="btnReset" class="btn btn-dark mb-3">Reset Filters</button>
+                    <div class="row">
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="txtName">Name:</label>
+                            <input type="text" class="form-control" id="txtName" name="sNameSearch" placeholder="Name">
                         </div>
-                        <div class="row">
-                            <div class="mb-3 col-md-4">
-                                <label class="form-label" for="inputAddress">Show  Only Unchecked:</label>
-                                <input class="form-check-input" type="checkbox" id="chkChecked" value="false" onclick="SetCheckedCheckBox()" asp-for=@Model.isCheckedSelected>
-                                <input id="txtIsChecked" hidden="true" />
-                            </div>
-                            <div class="mb-3 col-md-4">
-                                <label class="form-label" for="inputAddress">Referral Pathway:</label>
-                                <select class="form-select mb-3" id="ddlPathway" name="pathwayFilter" asp-for=@Model.pathwaySelected>
-                                    <option value="">Both</option>
-                                    <option value="Cancer">Cancer</option>
-                                    <option value="General">General</option>
-                                </select>
-                            </div>
-                            <div class="mb-3 col-md-4">
-                                <label class="form-label" for="inputAddress">Consultant:</label>
-                                <select class="form-select mb-3" id="ddlConsultant" name="consultantFilter" asp-for=@Model.consultantSelected>
-                                    <option value="" defaultValue>Select...</option>
-                                    @foreach (var item in Model.consultantList)
-                                    {
-                                        <option value=@item.NAME>@item.NAME</option>
-                                    }
-                                </select>
-                            </div>
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="txtCGU">CGU_No:</label>
+                            <input type="text" class="form-control" id="txtCGU" name="sCGUSearch" placeholder="CGU_No">
                         </div>
-                        <div class="row">
-                            <div class="mb-3 col-md-4">
-                                @*
-                                <label class="form-label" for="ddlGC">GC</label>
-                                <select class="form-select" id="ddlGC" name="gcFilter" asp-for=@Model.GCSelected>
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputPassword4">Priority:</label>
+                            <select class="form-select mb-3" id="ddlPriority" name="priorityFilter" asp-for=@Model.prioritySelected>
+                                <option value="">Any</option>
+                                <option value="Routine">Routine</option>
+                                <option value="Fast-Track">Fast-track</option>
+                                <option value="Urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputAddress">Show  Only Unchecked:</label>
+                            <input class="form-check-input" type="checkbox" id="chkChecked" value="false" onclick="SetCheckedCheckBox()" asp-for=@Model.isCheckedSelected>
+                            <input id="txtIsChecked" name="isChecked" hidden="true" />
+                        </div>
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputAddress">Referral Pathway:</label>
+                            <select class="form-select mb-3" id="ddlPathway" name="pathwayFilter" asp-for=@Model.pathwaySelected>
+                                <option value="">Both</option>
+                                <option value="Cancer">Cancer</option>
+                                <option value="General">General</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="inputAddress">Consultant:</label>
+                            <select class="form-select mb-3" id="ddlConsultant" name="consultantFilter" asp-for=@Model.consultantSelected>
+                                <option value="" defaultValue>Select...</option>
+                                @foreach (var item in Model.consultantList)
+                                {
+                                    <option value=@item.NAME>@item.NAME</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col-md-4">
+                            <label class="form-label" for="ddlGC">GC</label>
+                            <select class="form-select" id="ddlGC" name="gcFilter" asp-for=@Model.GCSelected>
                                 <option value="">Select...</option>
                                 @foreach (var item in Model.GCList)
                                 {

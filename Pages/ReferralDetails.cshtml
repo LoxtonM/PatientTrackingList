@@ -31,240 +31,243 @@
             </div>
         }
     }
+    <div class="card">
+        <div class="card-body">
 
-    <div class="row">
-        <h1>Referral details for @Model.RefDet.PatientName - @Model.RefDet.CGUNo</h1>
-    </div>
-    <div class="row">
-        <dt class="col-md-2">Type:</dt><dd class="col-md-10">@Model.RefDet.ReferralType</dd>
-        <dt class="col-md-2">Priority:</dt><dd class="col-md-10">@Model.RefDet.Class</dd>
-        <dt class="col-md-2">Consultant:</dt><dd class="col-md-10">@Model.RefDet.ReferralConsultant</dd>
-        <dt class="col-md-2">GC:</dt><dd class="col-md-10">@Model.RefDet.ReferralGC</dd>
-        <dt class="col-md-2">Clock Start Date:</dt><dd class="col-md-10">@Model.RefDet.ClockStart.Value.ToString("dd/MM/yyyy")</dd>
-        <dt class="col-md-2">Referred by:</dt><dd class="col-md-10">@Model.RefDet.ReferralBy</dd>
+           <div class="row">
+                <h1>Referral details for @Model.RefDet.PatientName - @Model.RefDet.CGUNo</h1>
+            </div>
+            <div class="row">
+                <dt class="col-md-2">Type:</dt><dd class="col-md-10">@Model.RefDet.ReferralType</dd>
+                <dt class="col-md-2">Priority:</dt><dd class="col-md-10">@Model.RefDet.Class</dd>
+                <dt class="col-md-2">Consultant:</dt><dd class="col-md-10">@Model.RefDet.ReferralConsultant</dd>
+                <dt class="col-md-2">GC:</dt><dd class="col-md-10">@Model.RefDet.ReferralGC</dd>
+                <dt class="col-md-2">Clock Start Date:</dt><dd class="col-md-10">@Model.RefDet.ClockStart.Value.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-md-2">Referred by:</dt><dd class="col-md-10">@Model.RefDet.ReferralBy</dd>
         @*<dt class="col-md-2">Organisation:</dt><dd class="col-md-10">@Model.RefDet.OrgCode - @Model.RefDet.OrgName</dd>*@
 
-        @if (@DateTime.Now > @Model.FiftyTwoWeekDate)
-        {
-            <dt class="col-md-12">
-                <h2 class="redtext">Warning: this referral is now over a year old!</h2>
-            </dt>
-        }
-        else if (@DateTime.Now > @Model.EighteenWeekDate)
-        {
-            <dt class="col-md-12">
-                <h2 class="ambertext">Alert: this referral is now beyond the 18 week breach date.</h2>
-            </dt>
-        }
-        else
-        {
-            <dt class="col-md-12">
-                @if ((@Model.EighteenWeekDate - @DateTime.Now).Days < 1)
+                @if (@DateTime.Now > @Model.FiftyTwoWeekDate)
                 {
-                    <h2>This referral will breach in less than a day.</h2>
+                    <dt class="col-md-12">
+                        <h2 class="redtext">Warning: this referral is now over a year old!</h2>
+                    </dt>
+                }
+                else if (@DateTime.Now > @Model.EighteenWeekDate)
+                {
+                    <dt class="col-md-12">
+                        <h2 class="ambertext">Alert: this referral is now beyond the 18 week breach date.</h2>
+                    </dt>
                 }
                 else
                 {
-                    <h2>This referral will breach in @((@Model.EighteenWeekDate - @DateTime.Now).Days) days.</h2>
+                    <dt class="col-md-12">
+                        @if ((@Model.EighteenWeekDate - @DateTime.Now).Days < 1)
+                        {
+                            <h2>This referral will breach in less than a day.</h2>
+                        }
+                        else
+                        {
+                            <h2>This referral will breach in @((@Model.EighteenWeekDate - @DateTime.Now).Days) days.</h2>
+                        }
+                    </dt>
                 }
-            </dt>
-        }
-        <br /><br />
-        @if(@Model.RefDet.TCIDate < DateTime.Now)
-        {
-            <h3>The patient was due to attend on @Model.RefDet.TCIDate.Value.ToString("dd/MM/yyyy") - awaiting outcome.</h3>
-        }
-        else if (Model.RefDet.TCIDate > DateTime.Now)
-        {
-            <h3>The patient is due to attend on @Model.RefDet.TCIDate.Value.ToString("dd/MM/yyyy"). The clock will be @Model.RefDet.ClockDaysAtTCI days old.</h3>
-        }
-        else
-        {
-            <h3>The patient does not have an appointment booked (or the clock has not been stopped following an appointment).</h3>
-        }
-        <br /><br />
-    </div>
-    <div class="row mb-5 g-5">
-        <form method="post">
-            <div class="row">
-                <div class="col-md-2">
-                    <label>Comments:</label>
-                </div>
-                <div class="col-md-10">
-                    <input id="txtComments" class="form-control" asp-for=@Model.RefDet.Comments name="comments" />
-                </div>
+                <br /><br />
+                @if(@Model.RefDet.TCIDate < DateTime.Now)
+                {
+                    <h3>The patient was due to attend on @Model.RefDet.TCIDate.Value.ToString("dd/MM/yyyy") - awaiting outcome.</h3>
+                }
+                else if (Model.RefDet.TCIDate > DateTime.Now)
+                {
+                    <h3>The patient is due to attend on @Model.RefDet.TCIDate.Value.ToString("dd/MM/yyyy"). The clock will be @Model.RefDet.ClockDaysAtTCI days old.</h3>
+                }
+                else
+                {
+                    <h3>The patient does not have an appointment booked (or the clock has not been stopped following an appointment).</h3>
+                }
+                <br /><br />
             </div>
-            <div class="row">
-                <div class="col-md-2">
-                    <label>Mark as checked:</label>
-                </div>
-                <div class="col-md-2">
-                    <input id="chkChecked" asp-for=@Model.RefDet.isChecked type="checkbox" onclick="SetCheckedCheckBox()" />
-                </div>
-                <div class="col-md-2">
-                    <input id="txtIsChecked" hidden="true" name="isChecked"  />
-                </div>
+            <div class="row mb-5 g-5">
+                <form method="post">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Comments:</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input id="txtComments" class="form-control" asp-for=@Model.RefDet.Comments name="comments" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Mark as checked:</label>
+                        </div>
+                        <div class="col-md-2">
+                            <input id="chkChecked" asp-for=@Model.RefDet.isChecked type="checkbox" onclick="SetCheckedCheckBox()" />
+                        </div>
+                        <div class="col-md-2">
+                            <input id="txtIsChecked" hidden="true" name="isChecked"  />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <input type="submit" class="btn btn-secondary" value="Save" />
+                        </div>
+                    </div>
+                </form>
             </div>
 
-            <div class="row">
-                <div class="col-md-2">
-                    <input type="submit" class="btn btn-secondary" value="Save" />
-                </div>
-            </div>
-        </form>
-    </div>
-
-    @if (Model.ActivityList.Count() > 0)
-    {
-        <h2>Related activity:</h2>
-        <div class="row">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>RefID</th>
-                        <th>Type</th>
-                        <th>Date</th>
-                        <th>Consultant</th>
-                        <th>GC</th>
-                        <th>Pathway</th>
-                        <th>Referral/Appointment Date</th>
-                        <th>Status</th>                    
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var r in Model.ActivityList)
-                    {
-                        <tr>
-                            <td>@r.RefID</td>
-                            <td>@r.TYPE</td>
-                            <td>@r.DATE_SCHEDULED.Value.ToString("dd/MM/yyyy")</td>
-                            <td>@r.PATIENT_TYPE</td>
-                            <td>@r.GC</td>
-                            <td>@r.PATHWAY</td>
-                            @if (@r.BOOKED_DATE == null)
+            @if (Model.ActivityList.Count() > 0)
+            {
+                <h2>Related activity:</h2>
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>RefID</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Consultant</th>
+                                <th>GC</th>
+                                <th>Pathway</th>
+                                <th>Referral/Appointment Date</th>
+                                <th>Status</th>                    
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.ActivityList)
                             {
-                                <td>@r.REFERRAL_DATE.Value.ToString("dd/MM/yyyy")</td>
-                                <td>@r.COMPLETE</td>
-                            }
-                            else
-                            {
-                                <td>@r.BOOKED_DATE.Value.ToString("dd/MM/yyyy")</td>                        
-                                @if (r.COUNSELED == null)
-                                {
-                                    <td>Pending</td>
-                                }
-                                else if (r.TYPE == "Tel. Admin")
-                                {
-                                    @*<td>@r.REASON_FOR_REFERRAL</td>   *@
-                                    <td>Phone call to/from patient</td>
-                                }
-                                else
-                                {
-                                    <td>@r.COUNSELED</td>
-                                }
-                            }
-                        </tr>
-                        @*would have been nice to nest appointments and diary entries together, alas we can not!*@
+                                <tr>
+                                    <td>@r.RefID</td>
+                                    <td>@r.TYPE</td>
+                                    <td>@r.DATE_SCHEDULED.Value.ToString("dd/MM/yyyy")</td>
+                                    <td>@r.PATIENT_TYPE</td>
+                                    <td>@r.GC</td>
+                                    <td>@r.PATHWAY</td>
+                                    @if (@r.BOOKED_DATE == null)
+                                    {
+                                        <td>@r.REFERRAL_DATE.Value.ToString("dd/MM/yyyy")</td>
+                                        <td>@r.COMPLETE</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@r.BOOKED_DATE.Value.ToString("dd/MM/yyyy")</td>                        
+                                        @if (r.COUNSELED == null)
+                                        {
+                                            <td>Pending</td>
+                                        }
+                                        else if (r.TYPE == "Tel. Admin")
+                                        {
+                                            @*<td>@r.REASON_FOR_REFERRAL</td>   *@
+                                            <td>Phone call to/from patient</td>
+                                        }
+                                        else
+                                        {
+                                            <td>@r.COUNSELED</td>
+                                        }
+                                    }
+                                </tr>
+                                @*would have been nice to nest appointments and diary entries together, alas we can not!*@
 
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-@*    else
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        @*    else
     {
         <h3>There is no activity related to this referral.</h3>
     }*@
 
-    @if (Model.DiaryList.Count() > 0)
-    {
-        <h2>Diary Entries related to referral:</h2>
+            @if (Model.DiaryList.Count() > 0)
+            {
+                <h2>Diary Entries related to referral:</h2>
 
-        <div class="row">
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        @*<th>RefID</th>*@
-                        <th>Date</th>
-                        <th>Staff Code</th>
-                        <th>Action Code</th>
-                        <th>Details</th>
-                        <th>Doc Code</th>
-                    </tr>
-                </thead>
-                <tbody>                
-                    @foreach (var d in Model.DiaryList)
-                    {
-                        <tr>
-                            @*<td>@d.RefID</td>*@
-                            @if (d.DiaryDate.HasValue)
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                @*<th>RefID</th>*@
+                                <th>Date</th>
+                                <th>Staff Code</th>
+                                <th>Action Code</th>
+                                <th>Details</th>
+                                <th>Doc Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>                
+                            @foreach (var d in Model.DiaryList)
                             {
-                                <td>@d.DiaryDate.Value.ToString("dd/MM/yyyy")</td>
-                            }
-                            else
+                                <tr>
+                                    @*<td>@d.RefID</td>*@
+                                    @if (d.DiaryDate.HasValue)
+                                    {
+                                        <td>@d.DiaryDate.Value.ToString("dd/MM/yyyy")</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    <td>@d.DiaryWith</td>
+                                    <td>@d.DiaryAction</td>
+                                    <td>@d.DiaryText</td>
+                                    <td>@d.DocCode</td>
+                                </tr>
+                            }                
+                        </tbody>
+                    </table>
+                </div>
+            }
+            @*else
+            {
+                <h3>There are no diary entries for this referral.</h3>
+            }*@
+
+            @if (Model.LetterList.Count() > 0)
+            {
+                <h2>Dictated Letters:</h2>
+                    
+                <div class="row">
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>DotID</th>
+                                <th>Date Dictated</th>
+                                <th>From</th>
+                                <th>To</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var l in Model.LetterList)
                             {
-                                <td></td>
+                                <tr>
+                                    <td>@l.DotID</td>
+                                    @if (l.DateDictated.HasValue)
+                                    {
+                                        <td>@l.DateDictated.Value.ToString("dd/MM/yyyy")</td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    <td>@l.LetterFrom</td>
+                                    <td>@l.LetterTo</td>
+                                </tr>
                             }
-                            <td>@d.DiaryWith</td>
-                            <td>@d.DiaryAction</td>
-                            <td>@d.DiaryText</td>
-                            <td>@d.DocCode</td>
-                        </tr>
-                    }                
-                </tbody>
-            </table>
-        </div>
-    }
-    @*else
-    {
-        <h3>There are no diary entries for this referral.</h3>
-    }*@
+                        </tbody>
+                    </table>
+                </div>
+            }
 
-    @if (Model.LetterList.Count() > 0)
-    {
-        <h2>Dictated Letters:</h2>
-
-        <div class="row">
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>DotID</th>
-                        <th>Date Dictated</th>
-                        <th>From</th>
-                        <th>To</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var l in Model.LetterList)
-                    {
-                        <tr>
-                            <td>@l.DotID</td>
-                            @if (l.DateDictated.HasValue)
-                            {
-                                <td>@l.DateDictated.Value.ToString("dd/MM/yyyy")</td>
-                            }
-                            else
-                            {
-                                <td></td>
-                            }
-                            <td>@l.LetterFrom</td>
-                        <td>@l.LetterTo</td>
-                     </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    }
-
-    <div class="row mb-5 g-5">
-        <div class="col-md-2">
-            <a type="button" class="btn btn-lg btn-secondary" asp-area="" asp-page="\Index" asp-route-consultantFilter=@Model.consultSelected
-               asp-route-gcFilter=@Model.gcSelected asp-route-pathwayFilter=@Model.pathSelected asp-route-triagePathwayFilter=@Model.triPathway asp-route-priorityFilter=@Model.priorFilter>Return</a>
+            <div class="row mb-5 g-5">
+                <div class="col-md-2">
+                    @*<a type="button" class="btn btn-lg btn-secondary" asp-area="" asp-page="\Index" asp-route-consultantFilter=@Model.consultSelected
+                       asp-route-gcFilter=@Model.gcSelected asp-route-pathwayFilter=@Model.pathSelected asp-route-triagePathwayFilter=@Model.triPathway asp-route-priorityFilter=@Model.priorFilter>Return</a>*@
+                    <button type="button" class="btn btn-lg btn-secondary" onclick="GoBack()">Return</button>
+                </div>
+            </div>
         </div>
     </div>
-
 </div>
 
 <script>

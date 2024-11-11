@@ -6,124 +6,129 @@
 
 
 <div class="container">
-
+    
     <h2>Clinic Slots - Total: @Model.listTotal</h2>
     <br /><br />
-
-    <div class="row mb-5">
-        <div class="col-md-2">            
-            <a class="btn btn-secondary" asp-area="" asp-page="/Download" asp-route-clinicianFilter=@Model.clincianSelected asp-route-clinicFilter=@Model.clinicSelected asp-route-dateFrom=@Model.fromDateSelected asp-route-dateTo=@Model.toDateSelected asp-route-statusFilter=@Model.statusSelected asp-route-username=@Model.User.Identity.Name asp-route-type="capacityutilisation">Export Data</a>
-        </div>
-    </div>
-
-    <div class="row mb-5">
-        <div class="col-md-2">
-            <label>Open slots</label>
-        </div>
-        <div class="col-md-2">
-            <label>@Model.openSlots</label>
-        </div>
-        <div class="col-md-2">
-            <label>Used slots</label>
-        </div>
-        <div class="col-md-2">
-            <label>@Model.usedSlots</label>
-        </div>
-        <div class="col-md-2">
-            <label>Unavailable slots</label>
-        </div>
-        <div class="col-md-2">
-            <label>@Model.unavailableSlots</label>
-        </div>
-    </div>
-
-    <form id="frmWLSearch" method="post">
-        <div class="row">        
-            <div class="col-md-1">
-                <label class="w-100">Clinician:</label>
-            </div>
-            <div class="col-md-2">
-                <select class="w-100" name="clinician" asp-for=@Model.clincianSelected>
-                    <option value="" selected></option>
-                    @foreach(var c in Model.Clinicians)
-                    {
-                        <option value=@c>@c</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-1">
-                <label class="w-100">Clinic:</label>
-            </div>
-            <div class="col-md-2">
-                <select class="w-100" name="clinic" asp-for="@Model.clinicSelected">
-                    <option value="" selected></option>
-                    @foreach (var c in Model.Clinics)
-                    {
-                        <option value=@c>@c</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-1">
-                <label class="w-100">Status:</label>
-            </div>
-            <div class="col-md-2">
-                <select class="w-100" name="status" asp-for="@Model.statusSelected">
-                    <option value="" selected></option>
-                    @foreach (var s in Model.Stati)
-                    {
-                        <option value=@s>@s</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-3"></div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-md-1">
-                <label class="w-100">From:</label>
-            </div>
-            <div class="col-md-2">
-                <input class="w-100" type="date" name="fromDate" asp-for="@Model.fromDateSelected" />
-            </div>
-            <div class="col-md-1">
-                <label class="w-100">To:</label>
-            </div>
-            <div class="col-md-2">
-                <input class="w-100" type="date" name="toDate" asp-for="@Model.toDateSelected" />
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-5">
+                <div class="col-md-2">            
+                    <a class="btn btn-secondary" asp-area="" asp-page="/Download" asp-route-clinicianFilter=@Model.clincianSelected asp-route-clinicFilter=@Model.clinicSelected asp-route-dateFrom=@Model.fromDateSelected asp-route-dateTo=@Model.toDateSelected asp-route-statusFilter=@Model.statusSelected asp-route-username=@Model.User.Identity.Name asp-route-type="capacityutilisation">Export Data</a>
+                </div>
             </div>
 
-            <div class="col-md-4"></div>
-            <div class="col-md-2">
-                <input type="submit" class="btn btn-secondary" />
+            <div class="row mb-5">
+                <div class="col-md-2">
+                    <label>Open slots</label>
+                </div>
+                <div class="col-md-2">
+                    <label>@Model.openSlots</label>
+                </div>
+                <div class="col-md-2">
+                    <label>Used slots</label>
+                </div>
+                <div class="col-md-2">
+                    <label>@Model.usedSlots</label>
+                </div>
+                <div class="col-md-2">
+                    <label>Unavailable slots</label>
+                </div>
+                <div class="col-md-2">
+                    <label>@Model.unavailableSlots</label>
+                </div>
             </div>
+
+    
+            <form id="frmWLSearch" method="post">
+                <div class="row">        
+                    <div class="col-md-1">
+                        <label class="w-100">Clinician:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="w-100" name="clinician" asp-for=@Model.clincianSelected>
+                            <option value="" selected></option>
+                            @foreach(var c in Model.Clinicians)
+                            {
+                                <option value=@c>@c</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="w-100">Clinic:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="w-100" name="clinic" asp-for="@Model.clinicSelected">
+                            <option value="" selected></option>
+                            @foreach (var c in Model.Clinics)
+                            {
+                                <option value=@c>@c</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="w-100">Status:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="w-100" name="status" asp-for="@Model.statusSelected">
+                            <option value="" selected></option>
+                            @foreach (var s in Model.Stati)
+                            {
+                                <option value=@s>@s</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-1">
+                        <label class="w-100">From:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <input class="w-100" type="date" name="fromDate" asp-for="@Model.fromDateSelected" />
+                    </div>
+                    <div class="col-md-1">
+                        <label class="w-100">To:</label>
+                    </div>
+                    <div class="col-md-2">
+                        <input class="w-100" type="date" name="toDate" asp-for="@Model.toDateSelected" />
+                    </div>
+                        
+                    <div class="col-md-4"></div>
+                    <div class="col-md-2">
+                        <input type="submit" class="btn btn-secondary" />
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
     <br /><br />
 
-    <table id="defaultTable" class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Clinician</th>
-                <th>Clinic</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var wl in Model.pageOfSlot)
-            {
-                <tr>
-                    <td>@wl.Clinician</td>                    
-                    <td>@wl.Facility</td>
-                    <td>@wl.SlotDate.Value.ToString("dd/MM/yyyy")</td>
-                    <td>@wl.SlotTime.Value.ToString("HH:mm")</td>
-                    <td>@wl.SlotStatus</td>                    
-                </tr>
-            }
-        </tbody>
-    </table>
-
+        <div class="card-body">
+            <table id="defaultTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Clinician</th>
+                        <th>Clinic</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var wl in Model.pageOfSlot)
+                    {
+                        <tr>
+                            <td>@wl.Clinician</td>                    
+                            <td>@wl.Facility</td>
+                            <td>@wl.SlotDate.Value.ToString("dd/MM/yyyy")</td>
+                            <td>@wl.SlotTime.Value.ToString("HH:mm")</td>
+                            <td>@wl.SlotStatus</td>                    
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
     
 
 </div>

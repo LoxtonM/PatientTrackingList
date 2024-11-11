@@ -88,8 +88,8 @@
                     </th>
 
                     <th>Name</th>
-                    <th>Clinician</th>
-                    <th>Clinic</th>
+                    <th>Referring Clinician</th>
+                    <th>Referring Facility</th>
                     <th>NHS No.</th>
                     <th>RefId</th>
                     <th>
@@ -171,6 +171,7 @@
 
                         <td>@item.Status_Admin</td>
                         <td>@item.PATHWAY</td>
+
                         <td>
                             <a asp-page="Icp" asp-route-scgudb="@item.CGU_No" asp-route-sName="@item.Firstname @item.Lastname" asp-route-sReferralId=@item.refid
                                asp-route-sAddress="@item.ADDRESS1 @item.address2 @item.address3 @item.address4 @item.postcode" asp-route-sDob="@item.dob"
@@ -183,6 +184,9 @@
                         <td>
                             <a class="btn btn-outline-primary" target="_blank" asp-route-sClinicno="@item.CLINICNO" asp-page="Appointment">Appointment</a>
                         </td>
+
+                        @*<td><a asp-page="WIP" class="btn btn-outline-primary">View ICP Data</a></td>*@
+
                     </tr>
                 }
             </tbody>
@@ -190,8 +194,8 @@
                 <tr>
                     <th>CGU Number</th>
                     <th>Name</th>
-                    <th>Clinician</th>
-                    <th>Clinic</th>
+                    <th>Referring Clinician</th>
+                    <th>Referring Facility</th>
                     <th>NHS No.</th>
                     <th>RefId</th>
                     <th>Referral Date</th>
