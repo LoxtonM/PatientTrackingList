@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using PatientTrackingList.Data;
 using PatientTrackingList.Models;
 using PatientTrackingList.DataServices;
+using ClinicalXPDataConnections.Meta;
+using ClinicalXPDataConnections.Data;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using ClinicalXPDataConnections.Models;
 
 namespace PatientTrackingList.Pages
 {
@@ -11,26 +14,28 @@ namespace PatientTrackingList.Pages
     {   
         private readonly IConfiguration _config;
         private readonly IPTLData _ptlData;
-        private readonly IStaffData _staffData;
+        private readonly IStaffUserData _staffData;
         private readonly INotificationData _notificationData;
         private readonly ISqlServices _sql;
         private readonly IListStatusAdminData _statusAdminData;
-        private readonly DataContext _context;        
-        public IndexModel(DataContext context, IConfiguration config)
+        private readonly DataContext _context;    
+        private readonly ClinicalContext _clinicalContext;
+        public IndexModel(DataContext context, ClinicalContext clinicalContext, IConfiguration config)
         {
             _context = context;
+            _clinicalContext = clinicalContext;
             _config = config;
             //pageNumbers = new List<int>();
             _ptlData = new PTLData(_context);
-            _staffData = new StaffData(_context);
-            _notificationData = new NotificationData(_context);
+            _staffData = new StaffUserData(_clinicalContext);
+            _notificationData = new NotificationData(_clinicalContext);
             _statusAdminData = new ListStatusAdminData(_context);
             _sql = new SqlServices(_config);
         }
         public IEnumerable<PTL> PTL { get; set; }
         //public List<int> pageNumbers;
-        public List<StaffMembers> consultantList { get; set; }
-        public List<StaffMembers> GCList { get; set; }
+        public List<StaffMember> consultantList { get; set; }
+        public List<StaffMember> GCList { get; set; }
         public List<PTL> pageOfPTL { get; set; }
         public IEnumerable<ListStatusAdmin> listStatusAdmin { get; set; }
         public DateTime CurrentYear;
@@ -75,6 +80,7 @@ namespace PatientTrackingList.Pages
         {
             try
             {
+                IPAddressFinder _ip = new IPAddressFinder(HttpContext);
                 string staffCode = "";
                 if (User.Identity.Name is null)
                 {
@@ -82,111 +88,25 @@ namespace PatientTrackingList.Pages
                 }
                 else
                 {
-                    notificationMessage = _notificationData.GetMessage();
+                    notificationMessage = _notificationData.GetMessage("PTLXOutage");
                                         
                     isLive = bool.Parse(_config.GetValue("IsLive", ""));
-                    staffCode = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;
-                    _sql.SqlWriteUsageAudit(staffCode, "", "Index");
+                    staffCode = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;                    
+                    _sql.SqlWriteUsageAudit(staffCode, "", "Index", _ip.GetIPAddress());
                 }
 
                 //int pageSize = 20;
 
                 PTL = _ptlData.GetPTLList();
 
-                consultantList = _staffData.GetStaffTypeList("Consultant");
-                GCList = _staffData.GetStaffTypeList("GC");
+                consultantList = _staffData.GetConsultantsList();
+                GCList = _staffData.GetGCList();
 
                 CurrentYear = DateTime.Parse($"{DateTime.Now.Year}-01-01");
                 PreviousYear = DateTime.Parse($"{(DateTime.Now.Year - 1)}-01-01");
                 EighteenWeekDate = DateTime.Now.AddDays(-18 * 7);
                 FiftyTwoWeekDate = DateTime.Now.AddDays(-365);
                 
-
-                //for sorting (ascending and descending on each column) - removed as no longer needed
-
-                /*switch (sortOrder)
-                {
-                    case "ref_date":
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => p.ReferralDate);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => p.ReferralDate);
-                        }
-                        break;
-                    case "cs_date":
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => p.ClockStart);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => p.ClockStart);
-                        }
-                        break;
-                    case "ref_reason":
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => p.ReferralReason);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => p.ReferralReason);
-                        }
-                        break;
-                    case "ref_class":
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => p.Class);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => p.Class);
-                        }
-                        break;
-                    case "clock_day":
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => DateTime.Now - p.ClockStart);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => DateTime.Now - p.ClockStart);
-                        }
-                        break;
-                    case "tci_date":
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => p.TCIDate);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => p.TCIDate);
-                        }
-                        break;
-                    case "clock_tci":
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => p.ClockDaysAtTCI);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => p.ClockDaysAtTCI);
-                        }
-                        break;
-                    default:
-                        if (isSortDesc)
-                        {
-                            PTL = PTL.OrderByDescending(p => p.ClockStart);
-                        }
-                        else
-                        {
-                            PTL = PTL.OrderBy(p => p.ClockStart);
-                        }
-                        break;
-                }*/
 
                 pageOfPTL = PTL.OrderBy(p => p.ClockStart).ToList(); //converting to list here makes it much faster!
                 
@@ -210,68 +130,68 @@ namespace PatientTrackingList.Pages
                 if (sNameSearch != null)
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.PatientName.Contains(sNameSearch, StringComparison.OrdinalIgnoreCase)).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"Name={sNameSearch}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Name={sNameSearch}", "Index", _ip.GetIPAddress());
                 }
 
                 if (sCGUSearch != null)
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.CGUNo.Contains(sCGUSearch)).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"CGU_No={sCGUSearch}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"CGU_No={sCGUSearch}", "Index", _ip.GetIPAddress());
                 }
 
                 if (priorityFilter != null && priorityFilter != "")
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.Class == priorityFilter).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"Priority={priorityFilter}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Priority={priorityFilter}", "Index", _ip.GetIPAddress());
                     prioritySelected = priorityFilter;
                 }
 
                 if (isChecked.GetValueOrDefault())
                 {
                     pageOfPTL = pageOfPTL.Where(p => !p.isChecked).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"Checked={isChecked}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Checked={isChecked}", "Index", _ip.GetIPAddress());
                     isCheckedSelected = isChecked.GetValueOrDefault();
                 }
 
                 if (pathwayFilter != null && pathwayFilter != "")
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.ReferralReason == pathwayFilter).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"Pathway={pathwayFilter}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Pathway={pathwayFilter}", "Index", _ip.GetIPAddress());
                     pathwaySelected = pathwayFilter;
                 }
 
                 if (consultantFilter != null && consultantFilter != "")
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.ReferralConsultant == consultantFilter).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"Consultant={consultantFilter}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Consultant={consultantFilter}", "Index", _ip.GetIPAddress());
                     consultantSelected = consultantFilter;
                 }
 
                 if (gcFilter != null && gcFilter != "")
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.ReferralGC == gcFilter).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"GC={gcFilter}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"GC={gcFilter}", "Index", _ip.GetIPAddress());
                     GCSelected = gcFilter;
                 }
 
                 if (commentsearch != null && commentsearch != "")
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.Comments != null && p.Comments.Contains(commentsearch, StringComparison.OrdinalIgnoreCase)).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"Comments={commentsearch}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Comments={commentsearch}", "Index", _ip.GetIPAddress());
                     commentSearch = commentsearch;
                 }
             
                if (triagePathwayFilter != null && triagePathwayFilter != "")
                {
                     pageOfPTL = pageOfPTL.Where(p => p.TriagePathway == triagePathwayFilter).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"TriagePathway={triagePathwayFilter}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"TriagePathway={triagePathwayFilter}", "Index", _ip.GetIPAddress());
                     triagePathway = triagePathwayFilter;
                 }
 
                 if (statusAdmin != null && statusAdmin != "")
                 {
                     pageOfPTL = pageOfPTL.Where(p => p.Status_Admin == statusAdmin).ToList();
-                    _sql.SqlWriteUsageAudit(staffCode, $"Status_Admin={statusAdmin}", "Index");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Status_Admin={statusAdmin}", "Index", _ip.GetIPAddress());
                     adminStatus = statusAdmin;
                 }
 
@@ -291,8 +211,8 @@ namespace PatientTrackingList.Pages
             {
                 PTL = _ptlData.GetPTLList();
 
-                consultantList = _staffData.GetStaffTypeList("Consultant");
-                GCList = _staffData.GetStaffTypeList("GC");
+                consultantList = _staffData.GetConsultantsList();
+                GCList = _staffData.GetGCList();
 
                 pageOfPTL = PTL.OrderBy(p => p.ClockStart).ToList();
                 listStatusAdmin = _statusAdminData.GetStatusAdminList();

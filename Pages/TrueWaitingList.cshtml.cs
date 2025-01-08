@@ -4,8 +4,9 @@ using PatientTrackingList.DataServices;
 using PatientTrackingList.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
-using System;
+using ClinicalXPDataConnections.Meta;
+using ClinicalXPDataConnections.Models;
+using ClinicalXPDataConnections.Data;
 
 
 namespace PatientTrackingList.Pages
@@ -13,27 +14,27 @@ namespace PatientTrackingList.Pages
     public class TrueWaitingListModel : PageModel
     {
         private readonly DataContext _context;
+        private readonly ClinicalContext _clinicalContext;
         private readonly IConfiguration _config;
         private readonly ISqlServices _sql;
-        private readonly IStaffData _staffData;
+        private readonly IStaffUserData _staffData;
         private readonly INotificationData _notificationData;
         private readonly ITrueWaitingListData _trueWaitingListData;
-        private readonly IConfiguration Configuration;
 
-        public TrueWaitingListModel(DataContext context, IConfiguration config, IConfiguration configuration)
+        public TrueWaitingListModel(DataContext context, ClinicalContext clinicalContext, IConfiguration config)
         {
             _context = context;
+            _clinicalContext = clinicalContext;
             _config = config;
             _sql = new SqlServices(_config);
-            _staffData = new StaffData(_context);
-            _notificationData = new NotificationData(_context);
+            _staffData = new StaffUserData(_clinicalContext);
+            _notificationData = new NotificationData(_clinicalContext);
             _trueWaitingListData = new TrueWaitingListData(_context);
-            Configuration = configuration;
         }
 
         public IEnumerable<TrueWaitingList> TrueWaitingList {get; set;}
-        public List<StaffMembers> consultantList { get; set; }
-        public List<StaffMembers> GCList { get; set; }
+        public List<StaffMember> consultantList { get; set; }
+        public List<StaffMember> GCList { get; set; }
         public int Total;
         public PaginatedList<TrueWaitingList> TrueWaitingLists { get; set; }
         public string NameSort { get; set; }
@@ -57,6 +58,7 @@ namespace PatientTrackingList.Pages
             string? sConsultants, string? sGC, bool? isDesc = false
             )
         {
+            IPAddressFinder _ip = new IPAddressFinder(HttpContext);
             string staffCode = "";
             if (User.Identity.Name is null)
             {
@@ -64,29 +66,29 @@ namespace PatientTrackingList.Pages
             }
             else
             {
-                notificationMessage = _notificationData.GetMessage();
+                notificationMessage = _notificationData.GetMessage("PTLXOutage");
 
                 isLive = bool.Parse(_config.GetValue("IsLive", ""));
                 staffCode = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;
-                _sql.SqlWriteUsageAudit(staffCode, "", "Index");
+                _sql.SqlWriteUsageAudit(staffCode, "", "Index", _ip.GetIPAddress());
             }
 
             var trueWaitingListQuery = _trueWaitingListData.GetTrueWaitingList();
             var trueWaitingListQueryAll = _trueWaitingListData.GetTrueWaitingList(true);
             isSortDesc = isDesc.GetValueOrDefault();
 
-            consultantList = _staffData.GetStaffTypeList("Consultant");
-            GCList = _staffData.GetStaffTypeList("GC");
+            consultantList = _staffData.GetConsultantsList();
+            GCList = _staffData.GetGCList();
 
             if (sCGU_No != null)
             {
                 trueWaitingListQuery = trueWaitingListQuery.Where(p => p.CGU_No.Contains(sCGU_No));
-                _sql.SqlWriteUsageAudit(staffCode, $"CGU_No={sCGU_No}", "TrueWaitingList");
+                _sql.SqlWriteUsageAudit(staffCode, $"CGU_No={sCGU_No}", "TrueWaitingList", _ip.GetIPAddress());
 
                 if (!trueWaitingListQuery.Any())
                 {
                     trueWaitingListQuery = trueWaitingListQueryAll.Where(p => p.CGU_No.Contains(sCGU_No));
-                    _sql.SqlWriteUsageAudit(staffCode, $"CGU_No={sCGU_No}", "TrueWaitingList");
+                    _sql.SqlWriteUsageAudit(staffCode, $"CGU_No={sCGU_No}", "TrueWaitingList", _ip.GetIPAddress());
                 }
                 searchCGU_No = sCGU_No;
             }
@@ -94,12 +96,12 @@ namespace PatientTrackingList.Pages
             if (sName != null)
             {
                 trueWaitingListQuery = trueWaitingListQuery.Where(p => p.Firstname.Contains(sName) || p.Lastname.Contains(sName));
-                _sql.SqlWriteUsageAudit(staffCode, $"Name={sName}", "TrueWaitingList");
+                _sql.SqlWriteUsageAudit(staffCode, $"Name={sName}", "TrueWaitingList", _ip.GetIPAddress());
 
                 if (!trueWaitingListQuery.Any())
                 {
                     trueWaitingListQuery = trueWaitingListQueryAll.Where(p => p.Firstname.Contains(sName) || p.Lastname.Contains(sName));
-                    _sql.SqlWriteUsageAudit(staffCode, $"Name={sName}", "TrueWaitingList");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Name={sName}", "TrueWaitingList", _ip.GetIPAddress());
                 }
                 searchName = sName;
             }
@@ -108,12 +110,12 @@ namespace PatientTrackingList.Pages
             {
                 DateTime referralDate = DateTime.Parse(sReferralDate);
                 trueWaitingListQuery = trueWaitingListQuery.Where(p => p.RefDate.HasValue && p.RefDate.Value.Date == referralDate.Date);
-                _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={sReferralDate}", "TrueWaitingList");
+                _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={sReferralDate}", "TrueWaitingList", _ip.GetIPAddress());
 
                 if (!trueWaitingListQuery.Any())
                 {
                     trueWaitingListQuery = trueWaitingListQuery.Where(p => p.RefDate.HasValue && p.RefDate.Value.Date == referralDate.Date);
-                    _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={sReferralDate}", "TrueWaitingList");
+                    _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={sReferralDate}", "TrueWaitingList", _ip.GetIPAddress());
                 }
                 searchReferralDate = sReferralDate;
             }
@@ -128,12 +130,12 @@ namespace PatientTrackingList.Pages
                 DateTime endDate = DateTime.ParseExact(endDateString, "yyyy-MM-dd", null);
 
                 trueWaitingListQuery = trueWaitingListQuery.Where(p => p.RefDate.HasValue && p.RefDate.Value >= startDate && p.RefDate.Value <= endDate);
-                _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={startDateString} {endDateString}", "TrueWaitingList");
+                _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={startDateString} {endDateString}", "TrueWaitingList", _ip.GetIPAddress());
 
                 if (!trueWaitingListQuery.Any())
                 {
                     trueWaitingListQuery = trueWaitingListQueryAll.Where(p => p.RefDate.HasValue && p.RefDate.Value >= startDate && p.RefDate.Value <= endDate);
-                    _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={startDateString} {endDateString}", "TrueWaitingList");
+                    _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={startDateString} {endDateString}", "TrueWaitingList", _ip.GetIPAddress());
                 }
                 searchRangeDate = sRangeDate;
             }
@@ -145,12 +147,12 @@ namespace PatientTrackingList.Pages
                 DateTime dateTime = new DateTime(year, 1, 1);
 
                 trueWaitingListQuery = trueWaitingListQuery.Where(p => p.RefDate.HasValue && p.RefDate.Value.Year == dateTime.Year);
-                _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={dateTime.Year}", "TrueWaitingList");
+                _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={dateTime.Year}", "TrueWaitingList", _ip.GetIPAddress());
 
                 if (!trueWaitingListQuery.Any())
                 {
                     trueWaitingListQuery = trueWaitingListQueryAll.Where(p => p.RefDate.HasValue && p.RefDate.Value.Year == dateTime.Year);
-                    _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={dateTime.Year}", "TrueWaitingList");
+                    _sql.SqlWriteUsageAudit(staffCode, $"ReferralDate={dateTime.Year}", "TrueWaitingList", _ip.GetIPAddress());
                 }
                 searchYearPicker = syearPicker;
             }
@@ -160,12 +162,12 @@ namespace PatientTrackingList.Pages
 
 
                 trueWaitingListQuery = trueWaitingListQuery.Where(p => p.LeadClinician == sConsultants);
-                _sql.SqlWriteUsageAudit(staffCode, $"Consultant={sConsultants}", "TrueWaitingList");
+                _sql.SqlWriteUsageAudit(staffCode, $"Consultant={sConsultants}", "TrueWaitingList", _ip.GetIPAddress());
 
                 if (!trueWaitingListQuery.Any())
                 {
                     trueWaitingListQuery = trueWaitingListQueryAll.Where((p => p.LeadClinician == sConsultants));
-                    _sql.SqlWriteUsageAudit(staffCode, $"Consultant={sConsultants}", "TrueWaitingList");
+                    _sql.SqlWriteUsageAudit(staffCode, $"Consultant={sConsultants}", "TrueWaitingList", _ip.GetIPAddress());
                 }
                 searchConsultant = sConsultants;
             }
@@ -174,12 +176,12 @@ namespace PatientTrackingList.Pages
             {
 
                 trueWaitingListQuery = trueWaitingListQuery.Where(p => p.GC == sGC);
-                _sql.SqlWriteUsageAudit(staffCode, $"GC={sGC}", "TrueWaitingList");
+                _sql.SqlWriteUsageAudit(staffCode, $"GC={sGC}", "TrueWaitingList", _ip.GetIPAddress());
 
                 if (!trueWaitingListQuery.Any())
                 {
                     trueWaitingListQuery = trueWaitingListQueryAll.Where((p => p.GC == sGC));
-                    _sql.SqlWriteUsageAudit(staffCode, $"GC={sGC}", "TrueWaitingList");
+                    _sql.SqlWriteUsageAudit(staffCode, $"GC={sGC}", "TrueWaitingList", _ip.GetIPAddress());
                 }
                 searchGC = sGC;
             }

@@ -2,27 +2,31 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using PatientTrackingList.Data;
 using PatientTrackingList.DataServices;
 using PatientTrackingList.Models;
+using ClinicalXPDataConnections.Meta;
+using ClinicalXPDataConnections.Data;
 
 namespace PatientTrackingList.Pages
 {
     public class CapacityUtilisationModel : PageModel
     {
         private readonly DataContext _context;
+        private readonly ClinicalContext _clinicalContext;
         private readonly IClinicSlotData _clinicSlotData;
         private readonly IConfiguration _config;
         private readonly ISqlServices _sql;
-        private readonly IStaffData _staffData;
+        private readonly IStaffUserData _staffData;
 
-        public CapacityUtilisationModel(DataContext context, IConfiguration config)
+        public CapacityUtilisationModel(DataContext context, ClinicalContext clinicalContext, IConfiguration config)
         {
             _context = context;
+            _clinicalContext = clinicalContext;
             _config = config;
             _clinicSlotData = new ClinicSlotData(_context);
             Clinicians = new List<string>();
             Clinics = new List<string>();
             Stati = new List<string>();
             _sql = new SqlServices(_config);
-            _staffData = new StaffData(_context);
+            _staffData = new StaffUserData(_clinicalContext);
         }
 
         public IEnumerable<ClinicSlots> ClinicSlots { get; set; }
@@ -44,6 +48,7 @@ namespace PatientTrackingList.Pages
 
         public void OnGet(string? clinician, string? clinic, DateTime? fromDate, DateTime? toDate, string? status)
         {
+            IPAddressFinder _ip = new IPAddressFinder(HttpContext);
             string staffCode = "";
             if (User.Identity.Name is null)
             {
@@ -52,7 +57,7 @@ namespace PatientTrackingList.Pages
             else
             {
                 staffCode = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;
-                _sql.SqlWriteUsageAudit(staffCode, "", "Capacity Utilisation");
+                _sql.SqlWriteUsageAudit(staffCode, "", "Capacity Utilisation", _ip.GetIPAddress());
             }
 
             int pageSize = 20;            
@@ -70,14 +75,14 @@ namespace PatientTrackingList.Pages
             if (clinician != null)
             {
                 ClinicSlots = ClinicSlots.Where(w => w.Clinician == clinician);
-                _sql.SqlWriteUsageAudit(staffCode, $"Clinician={clinician}", "Capacity Utilisation");
+                _sql.SqlWriteUsageAudit(staffCode, $"Clinician={clinician}", "Capacity Utilisation", _ip.GetIPAddress());
                 clincianSelected = clinician;
             }
 
             if (clinic != null)
             {
                 ClinicSlots = ClinicSlots.Where(w => w.Facility == clinic);
-                _sql.SqlWriteUsageAudit(staffCode, $"Clinic={clinic}", "Capacity Utilisation");
+                _sql.SqlWriteUsageAudit(staffCode, $"Clinic={clinic}", "Capacity Utilisation", _ip.GetIPAddress());
                 clinicSelected = clinic;
             }
 

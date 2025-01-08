@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PatientTrackingList.Models;
+using ClinicalXPDataConnections.Data;
+using ClinicalXPDataConnections.Models;
 
 namespace PatientTrackingList.Data
 {
@@ -7,12 +9,12 @@ namespace PatientTrackingList.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         public DbSet<PTL> PTL {  get; set; }
-        public DbSet<Activity> Activity { get; set; }
+        public DbSet<ActivityItem> Activity { get; set; }
         public DbSet<Diary> Diary { get; set; }
         public DbSet<Letters> Letters { get; set; }
         public DbSet<WaitingList> WaitingList { get; set; }
         public DbSet<Patients> Patients { get; set; }
-        public DbSet<StaffMembers> StaffMembers { get; set; }
+        public DbSet<StaffMember> StaffMembers { get; set; }
         public DbSet<ClinicSlots> ClinicSlots { get; set; }
         public DbSet<Notifications> Notifications { get; set; }
         public DbSet<TrueWaitingList> TrueWaitingLists { get; set; }

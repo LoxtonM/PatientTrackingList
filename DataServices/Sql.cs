@@ -4,16 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using PatientTrackingList.Data;
 using PatientTrackingList.Models;
 using System.Data;
+using System.Net;
 using System.Xml.Linq;
 
 namespace PatientTrackingList.DataServices
 {
     interface ISqlServices
     {
-        public void SqlUpdateComments(string comments, int isChecked, string username, int id);
+        public void SqlUpdateComments(string comments, int isChecked, string username, int id, string ipAddress);
         public string GetOldComments(int id);
-        public void SqlWriteAuditUpdate(string comments, string oldComments, string username, int id);
-        public void SqlWriteUsageAudit(string username, string searchTerm, string formName);
+        public void SqlWriteAuditUpdate(string comments, string oldComments, string username, int id, string ipAddress);
+        public void SqlWriteUsageAudit(string username, string searchTerm, string formName, string ipAddress);
         public string ValidateLogin(UserDetails user);
     }
     public class SqlServices : ISqlServices
@@ -29,7 +30,7 @@ namespace PatientTrackingList.DataServices
         }
 
 
-        public void SqlUpdateComments(string comments, int isChecked, string username, int id)
+        public void SqlUpdateComments(string comments, int isChecked, string username, int id, string ipAddress)
         {
             string oldComment = GetOldComments(id);
             
@@ -50,7 +51,7 @@ namespace PatientTrackingList.DataServices
             _cmd.ExecuteNonQuery();
             _con.Close();
 
-            SqlWriteAuditUpdate(comments, oldComment, username, id);
+            SqlWriteAuditUpdate(comments, oldComment, username, id, ipAddress);
         }
 
         public string GetOldComments(int id)
@@ -72,7 +73,7 @@ namespace PatientTrackingList.DataServices
             return commentOld;
         }
 
-        public void SqlWriteAuditUpdate(string comments, string oldComments, string username, int id)
+        public void SqlWriteAuditUpdate(string comments, string oldComments, string username, int id, string ipAddress)
         {            
             SqlCommand cmd = new SqlCommand("[sp_WriteAuditUpdate]", _con);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -82,7 +83,7 @@ namespace PatientTrackingList.DataServices
             cmd.Parameters.Add("@recordkey", SqlDbType.VarChar).Value = id.ToString();
             cmd.Parameters.Add("@oldValue", SqlDbType.VarChar).Value = oldComments;
             cmd.Parameters.Add("@newValue", SqlDbType.VarChar).Value = comments;
-            cmd.Parameters.Add("machineName", SqlDbType.VarChar).Value = System.Environment.MachineName;
+            cmd.Parameters.Add("machineName", SqlDbType.VarChar).Value = Dns.GetHostByAddress(ipAddress).HostName.Substring(0, 10);
 
 
             _con.Open();
@@ -90,7 +91,7 @@ namespace PatientTrackingList.DataServices
             _con.Close();
         }
 
-        public void SqlWriteUsageAudit(string username, string searchTerm, string formName)
+        public void SqlWriteUsageAudit(string username, string searchTerm, string formName, string ipAddress)
         {
             SqlCommand cmd = new SqlCommand("[sp_CreateAudit]", _con);
             cmd.CommandType = System.Data.CommandType.StoredProcedure;
@@ -98,7 +99,7 @@ namespace PatientTrackingList.DataServices
             cmd.Parameters.Add("@form", SqlDbType.VarChar).Value = formName;
             cmd.Parameters.Add("@database", SqlDbType.VarChar).Value = "PTL-X";
             cmd.Parameters.Add("@searchTerm", SqlDbType.VarChar).Value = searchTerm;
-            cmd.Parameters.Add("@machine", SqlDbType.VarChar).Value = System.Environment.MachineName;
+            cmd.Parameters.Add("@machine", SqlDbType.VarChar).Value = Dns.GetHostByAddress(ipAddress).HostName.Substring(0, 10);
 
             _con.Open();
             cmd.ExecuteNonQuery();

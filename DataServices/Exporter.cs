@@ -2,6 +2,9 @@
 using PatientTrackingList.Data;
 using PatientTrackingList.Models;
 using System.Data;
+using ClinicalXPDataConnections.Meta;
+using ClinicalXPDataConnections.Models;
+using ClinicalXPDataConnections.Data;
 
 
 namespace PatientTrackingList.DataServices
@@ -10,15 +13,17 @@ namespace PatientTrackingList.DataServices
     {
         public string dlFilePath;
         private readonly DataContext _context;
+        private readonly ClinicalContext _clinContext;
         private readonly PTLData _ptlData;
-        private readonly WaitingListData _waitingListData;
+        private readonly IWaitingListData _waitingListData;
         private readonly ClinicSlotData _clinicSlotData;
 
-        public Exporter(DataContext context)
+        public Exporter(DataContext context, ClinicalContext clinContext)
         {
             _context = context;
+            _clinContext = clinContext;
             _ptlData = new PTLData(_context);
-            _waitingListData = new WaitingListData(_context);
+            _waitingListData = new WaitingListData(_clinContext);
             _clinicSlotData = new ClinicSlotData(_context);
         }
         public void ExportPTL(List<PTL> ptlToExport, string username)
@@ -245,7 +250,7 @@ namespace PatientTrackingList.DataServices
             else if (type == "waitinglist")
             {
                 List<WaitingList> wlToExport = new List<WaitingList>();
-                wlToExport = _waitingListData.GetWaitingList().ToList();
+                wlToExport = _waitingListData.GetWaitingList(null,null).ToList();
 
                 
                 if (clinicianFilter != null && clinicianFilter != "")

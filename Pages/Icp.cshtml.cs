@@ -2,15 +2,19 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using PatientTrackingList.Data;
 using PatientTrackingList.DataServices;
 using PatientTrackingList.Models;
+using ClinicalXPDataConnections.Meta;
+using ClinicalXPDataConnections.Models;
+using ClinicalXPDataConnections.Data;
 
 namespace PatientTrackingList.Pages
 {
     public class IcpModel : PageModel
     {
         private readonly DataContext _context;
+        private readonly ClinicalContext _clinicalContext;
         private readonly IConfiguration _config;
         private readonly ISqlServices _sql;
-        private readonly IStaffData _staffData;
+        private readonly IStaffUserData _staffData;
         private readonly IIcpData _icpData;
         private readonly IConfiguration Configuration;
         private readonly INotificationData _notificationData;
@@ -18,17 +22,16 @@ namespace PatientTrackingList.Pages
         private readonly IAppointmentData _appointmentData;
 
 
-        public IcpModel(DataContext context, IConfiguration config, IConfiguration configuration)
+        public IcpModel(DataContext context, ClinicalContext clinicalContext, IConfiguration config)
         {
             _context = context;
             _config = config;
             _sql = new SqlServices(_config);
-            _staffData = new StaffData(_context);
+            _staffData = new StaffUserData(_clinicalContext);
             _icpData = new IcpData(_context);
-            _notificationData = new NotificationData(_context);
+            _notificationData = new NotificationData(_clinicalContext);
             _clincalOutcomesData = new ClicnicalOutcomesData(_context);
-            _appointmentData = new AppointmentData(_context);
-            Configuration = configuration;
+            _appointmentData = new AppointmentData(_clinicalContext);
         }
 
         public Icp IcpDetail { get; set; }
@@ -60,6 +63,7 @@ namespace PatientTrackingList.Pages
             string? sIndicationNotes, string? sClinicno
             )
         {
+            IPAddressFinder _ip = new IPAddressFinder(HttpContext);
             string staffCode = "";
             if (User.Identity.Name is null)
             {
@@ -67,11 +71,11 @@ namespace PatientTrackingList.Pages
             }
             else
             {
-                notificationMessage = _notificationData.GetMessage();
+                notificationMessage = _notificationData.GetMessage("PTLXOutage");
 
                 isLive = bool.Parse(_config.GetValue("IsLive", ""));
                 staffCode = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;
-                _sql.SqlWriteUsageAudit(staffCode, "", "Index");
+                _sql.SqlWriteUsageAudit(staffCode, "", "Index", _ip.GetIPAddress());
             }
 
             if (sName != null || sAddress != null || sRefType != null || sRefDate != null || sRefClinician != null || sDob != null || sNhsNo != null
@@ -109,13 +113,13 @@ namespace PatientTrackingList.Pages
                     if (IcpId != null)
                     {
                         IcpCancerDetail = _icpData.GetIcpCancer(IcpId);
-                        _sql.SqlWriteUsageAudit(staffCode, $"ReferralId={sReferralId}", "ICP");
+                        _sql.SqlWriteUsageAudit(staffCode, $"ReferralId={sReferralId}", "ICP", _ip.GetIPAddress());
                     }
 
                     if (IcpCancerDetail == null)
                     {
                         IcpGeneralDetail = _icpData.GetIcpGeneral(IcpId);
-                        _sql.SqlWriteUsageAudit(staffCode, $"ReferralId={sReferralId}", "ICP");
+                        _sql.SqlWriteUsageAudit(staffCode, $"ReferralId={sReferralId}", "ICP", _ip.GetIPAddress());
                     }
                 }
 

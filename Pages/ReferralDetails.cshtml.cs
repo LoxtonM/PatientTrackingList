@@ -4,34 +4,39 @@ using PatientTrackingList.Data;
 using PatientTrackingList.Models;
 using PatientTrackingList.DataServices;
 using System.Web;
+using ClinicalXPDataConnections.Meta;
+using ClinicalXPDataConnections.Models;
+using ClinicalXPDataConnections.Data;
 
 namespace PatientTrackingList.Pages
 {
     public class ReferralDetailsModel : PageModel
     {
-        private readonly DataContext _context;
+        private readonly ClinicalContext _context;
+        private readonly DataContext _dataContext;
         private readonly IConfiguration _config;
         private readonly IPTLData _ptlData;        
-        private readonly IStaffData _staffData;
+        private readonly IStaffUserData _staffData;
         private readonly IActivityData _activityData;
         private readonly IDiaryData _diaryData;
         private readonly ILetterData _letterData;
         private readonly ISqlServices _sql;
 
-        public ReferralDetailsModel(DataContext context, IConfiguration config)
+        public ReferralDetailsModel(ClinicalContext context, DataContext dataContext, IConfiguration config)
         {
             _context = context;
+            _dataContext = dataContext;
             _config = config;
-            _ptlData = new PTLData(_context);
-            _staffData = new StaffData(_context);
+            _ptlData = new PTLData(_dataContext);
+            _staffData = new StaffUserData(_context);;
             _activityData = new ActivityData(_context);
             _diaryData = new DiaryData(_context);
-            _letterData = new LetterData(_context);
+            _letterData = new LetterData(_dataContext);
             _sql = new SqlServices(_config);
         }
 
         public PTL RefDet { get; set; }
-        public List<Activity> ActivityList { get; set; }        
+        public List<ActivityItem> ActivityList { get; set; }        
         public List<Diary> DiaryList { get; set; }
         public List<Letters> LetterList { get; set; }
 
@@ -52,6 +57,7 @@ namespace PatientTrackingList.Pages
         {
             try
             {
+                IPAddressFinder _ip = new IPAddressFinder(HttpContext);
                 string staffCode = "";
                 if (User.Identity.Name is null)
                 {
@@ -60,15 +66,15 @@ namespace PatientTrackingList.Pages
                 else
                 {
                     staffCode = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;
-                    _sql.SqlWriteUsageAudit(staffCode, $"PTL ID={id.ToString()}", "Details");
+                    _sql.SqlWriteUsageAudit(staffCode, $"PTL ID={id.ToString()}", "Details", _ip.GetIPAddress());
                 }
 
                 Message = message;
                 isSuccess = success.GetValueOrDefault();
                 RefDet = _ptlData.GetPTLEntryDetails(id);
                 int refID = RefDet.RefID;
-                var Referral = _activityData.GetReferralDetails(refID);
-                ActivityList = _activityData.GetActivityList(Referral.CLINICNO);
+                var Referral = _activityData.GetActivityDetails(refID);
+                ActivityList = _activityData.GetActivityListByClinicno(Referral.CLINICNO);
                 DiaryList = _diaryData.GetDiaryList(refID);
                 LetterList = _letterData.GetLetterList(refID);
 
@@ -96,8 +102,8 @@ namespace PatientTrackingList.Pages
             {                
                 RefDet = _ptlData.GetPTLEntryDetails(id);
                 int refID = RefDet.RefID;
-                var Referral = _activityData.GetReferralDetails(refID);
-                ActivityList = _activityData.GetActivityList(Referral.CLINICNO);
+                var Referral = _activityData.GetActivityDetails(refID);
+                ActivityList = _activityData.GetActivityListByClinicno(Referral.CLINICNO);
                 DiaryList = _diaryData.GetDiaryList(refID);
                 LetterList = _letterData.GetLetterList(refID);
 
@@ -114,8 +120,10 @@ namespace PatientTrackingList.Pages
                 if(isChecked.GetValueOrDefault()) { iChecked = 1; }
 
                 string username = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;
+                
+                IPAddressFinder _ip = new IPAddressFinder(HttpContext);
 
-                _sql.SqlUpdateComments(comments, iChecked, username, id);
+                _sql.SqlUpdateComments(comments, iChecked, username, id, _ip.GetIPAddress());
                                                 
                 isSuccess = true;
                 string message = "Saved.";

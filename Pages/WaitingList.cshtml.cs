@@ -1,29 +1,33 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PatientTrackingList.Data;
 using PatientTrackingList.DataServices;
-using PatientTrackingList.Models;
+using ClinicalXPDataConnections.Models;
+using ClinicalXPDataConnections.Meta;
+using ClinicalXPDataConnections.Data;
 
 namespace PatientTrackingList.Pages
 {
     public class WaitingListModel : PageModel
     {
         private readonly DataContext _context;
+        private readonly ClinicalContext _clinicalContext;
         private readonly IWaitingListData _waitingListData;
         private readonly IConfiguration _config;
         private readonly ISqlServices _sql;
-        private readonly IStaffData _staffData;
+        private readonly IStaffUserData _staffData;
         
 
-        public WaitingListModel(DataContext context, IConfiguration config)
+        public WaitingListModel(DataContext context, ClinicalContext clinicalContext, IConfiguration config)
         {
             _context = context;
+            _clinicalContext = clinicalContext;
             _config = config;
-            _waitingListData = new WaitingListData(_context);
+            _waitingListData = new WaitingListData(_clinicalContext);
             pageNumbers = new List<int>();
             Clinicians = new List<string>();
             Clinics = new List<string>();
             _sql = new SqlServices(_config);
-            _staffData = new StaffData(_context);
+            _staffData = new StaffUserData(_clinicalContext);
         }
         public IEnumerable<WaitingList> WaitingList { get; set; }
         public List<WaitingList> pageOfWL { get; set; }
@@ -40,6 +44,7 @@ namespace PatientTrackingList.Pages
 
         public void OnGet(int? pNo, string? clinician, string? clinic)
         {
+            IPAddressFinder _ip = new IPAddressFinder(HttpContext);
             string staffCode = "";
             if (User.Identity.Name is null)
             {
@@ -48,12 +53,12 @@ namespace PatientTrackingList.Pages
             else
             {
                 staffCode = _staffData.GetStaffMemberDetails(User.Identity.Name).STAFF_CODE;
-                _sql.SqlWriteUsageAudit(staffCode, "", "Waiting List");
+                _sql.SqlWriteUsageAudit(staffCode, "", "Waiting List", _ip.GetIPAddress());
             }
 
                  
 
-            WaitingList = _waitingListData.GetWaitingList();
+            WaitingList = _waitingListData.GetWaitingList(null,null);
 
             //for WL total
             //listTotal = WaitingList.Count();
@@ -65,14 +70,14 @@ namespace PatientTrackingList.Pages
             if (clinician != null)
             {
                 WaitingList = WaitingList.Where(w => w.ClinicianID == clinician);
-                _sql.SqlWriteUsageAudit(staffCode, $"Clinician={clinician}", "Waiting List");
+                _sql.SqlWriteUsageAudit(staffCode, $"Clinician={clinician}", "Waiting List", _ip.GetIPAddress());
                 clincianSelected = clinician;
             }
 
             if (clinic != null)
             {
                 WaitingList = WaitingList.Where(w => w.ClinicID == clinic);
-                _sql.SqlWriteUsageAudit(staffCode, $"Clinic={clinic}", "Waiting List");
+                _sql.SqlWriteUsageAudit(staffCode, $"Clinic={clinic}", "Waiting List", _ip.GetIPAddress());
                 clinicSelected = clinic;
             }
 
@@ -86,7 +91,7 @@ namespace PatientTrackingList.Pages
 
         public void OnPost(int? pNo, string? clinician, string? clinic)
         {
-            WaitingList = _waitingListData.GetWaitingList();
+            WaitingList = _waitingListData.GetWaitingList(null,null);
 
             //have to give it something, even if I'm instantly redirecting, or it'll throw a fit
             Clinicians = WaitingList.Select(c => c.ClinicianID).Distinct().OrderBy(c => c).ToList();
