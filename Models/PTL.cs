@@ -26,8 +26,7 @@ namespace PatientTrackingList.Models
         public string? ReferralReason { get; set; }
         public string? ReferralConsultant { get; set; }
         public string? ReferralGC { get; set; }
-        //public string? NHSNo { get; set; }
-        //public DateTime? PtDOB { get; set; }
+        public string? AdminContact { get; set; }
         public string? Class {  get; set; }
         //public string? BreachReason {  get; set; }
         public DateTime? TCIDate { get; set; }
@@ -42,5 +41,8 @@ namespace PatientTrackingList.Models
         public string? UpdatedBy { get; set; }
         public string? TriagePathway { get; set; }
         public string? Status_Admin { get; set; }
+        public DateTime? WaitingListDate { get; set; }
+        public string? PtAreaCode { get; set; }
+        public string? PtAreaName { get; set; }
     }
 }

@@ -12,7 +12,7 @@
                asp-page="/Download" asp-route-consultantFilter=@Model.consultantSelected
                asp-route-gcFilter=@Model.GCSelected asp-route-pathwayFilter=@Model.pathwaySelected
                asp-route-username=@Model.User.Identity.Name asp-route-type="ptl" asp-route-triagePathwayFilter="@Model.triagePathway"
-               asp-route-statusAdmin="@Model.adminStatus">Export Data</a>
+               asp-route-statusAdmin="@Model.adminStatus" asp-route-areaName="@Model.areaNameSelected">Export Data</a>
         </div>
     </div>
     @if (!Model.isLive)
@@ -194,16 +194,24 @@
                         </div>
                         <div class="row">
 
-                            <div class="mb-3">
+                            <div class="col mb-3">
                                 <label class="form-label" for="ddladminStatus">Admin Status:</label>
                                 <select id="ddladminStatus" class="form-select" asp-for=@Model.adminStatus name="statusAdmin">
                                     <option value="" defaultValue>Select...</option>
-
                                     @foreach (var item in Model.listStatusAdmin)
                                     {
                                         <option value="@item.Status_Admin">@item.Status_Admin</option>
                                     }
-
+                                </select>
+                            </div>
+                            <div class="col mb-3">
+                                <label class="form-label" for="ddladminDistrict">Admin District:</label>
+                                <select id="ddladminDistrict" class="form-select" asp-for=@Model.adminDistrictSelected name="adminDistrict">
+                                    <option value="" defaultValue>Select...</option>
+                                    @foreach (var item in Model.listAdminDistricts)
+                                    {
+                                        <option value="@item.AreaID">@item.AreaName - @item.AreaCode</option>
+                                    }
                                 </select>
                             </div>
                         </div>
@@ -233,7 +241,9 @@
                                     <th>Clock Ticking (Weeks)</th>
                                     <th>Clock Weeks at TCI</th>
                                     <th>Triage Pathway</th>
+                                    <th>Admin Contact</th>
                                     <th>Comments</th>
+                                    <th>Date on Waiting List</th>
                                     <th>Checked</th>
                                     <th>Last Updated</th>
                                 </tr>
@@ -294,7 +304,16 @@
                                                 <td class="text-danger">N/A</td>
                                             }
                                             <td class="text-danger">@p.TriagePathway</td>
+                                            <td class="text-danger">@p.AdminContact</td>
                                             <td class="text-danger">@p.Comments</td>
+                                            @if(p.WaitingListDate != null)
+                                            {
+                                                <td class ="text-danger">@p.WaitingListDate.Value.ToString("dd/MM/yyyy")</td>
+                                            }
+                                            else
+                                            {
+                                                <td class="text-danger">N/A</td>
+                                            }
                                             @if (p.isChecked)
                                             {
                                                 <td class="text-danger">Yes</td>
@@ -364,7 +383,16 @@
                                                 <td class="text-warning">N/A</td>
                                             }
                                             <td class="text-warning">@p.TriagePathway</td>
+                                            <td class="text-warning">@p.AdminContact</td>
                                             <td class="text-warning">@p.Comments</td>
+                                            @if (p.WaitingListDate != null)
+                                            {
+                                                <td class="text-warning">@p.WaitingListDate.Value.ToString("dd/MM/yyyy")</td>
+                                            }
+                                            else
+                                            {
+                                                <td class="text-warning">N/A</td>
+                                            }
                                             @if (p.isChecked)
                                             {
                                                 <td class="text-warning">Yes</td>
@@ -434,7 +462,16 @@
                                                 <td>N/A</td>
                                             }
                                             <td>@p.TriagePathway</td>
+                                            <td>@p.AdminContact</td>
                                             <td>@p.Comments</td>
+                                            @if (p.WaitingListDate != null)
+                                            {
+                                                <td>@p.WaitingListDate.Value.ToString("dd/MM/yyyy")</td>
+                                            }
+                                            else
+                                            {
+                                                <td>N/A</td>
+                                            }
                                             @if (p.isChecked)
                                             {
                                                 <td>Yes</td>

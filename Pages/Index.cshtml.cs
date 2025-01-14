@@ -5,7 +5,6 @@ using PatientTrackingList.Models;
 using PatientTrackingList.DataServices;
 using ClinicalXPDataConnections.Meta;
 using ClinicalXPDataConnections.Data;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using ClinicalXPDataConnections.Models;
 
 namespace PatientTrackingList.Pages
@@ -18,6 +17,7 @@ namespace PatientTrackingList.Pages
         private readonly INotificationData _notificationData;
         private readonly ISqlServices _sql;
         private readonly IListStatusAdminData _statusAdminData;
+        private readonly IAreaNamesData _areaNamesData;
         private readonly DataContext _context;    
         private readonly ClinicalContext _clinicalContext;
         public IndexModel(DataContext context, ClinicalContext clinicalContext, IConfiguration config)
@@ -25,30 +25,25 @@ namespace PatientTrackingList.Pages
             _context = context;
             _clinicalContext = clinicalContext;
             _config = config;
-            //pageNumbers = new List<int>();
             _ptlData = new PTLData(_context);
             _staffData = new StaffUserData(_clinicalContext);
             _notificationData = new NotificationData(_clinicalContext);
             _statusAdminData = new ListStatusAdminData(_context);
+            _areaNamesData = new AreaNamesData(_clinicalContext);
             _sql = new SqlServices(_config);
         }
         public IEnumerable<PTL> PTL { get; set; }
-        //public List<int> pageNumbers;
         public List<StaffMember> consultantList { get; set; }
         public List<StaffMember> GCList { get; set; }
         public List<PTL> pageOfPTL { get; set; }
         public IEnumerable<ListStatusAdmin> listStatusAdmin { get; set; }
+        public IEnumerable<AreaNames> listAdminDistricts { get; set; }
         public DateTime CurrentYear;
         public DateTime PreviousYear;
         public DateTime EighteenWeekDate;
         public DateTime FiftyTwoWeekDate;
         public DateTime LastUpdatedDate;
-        //public bool isSortDesc;
-        
-        //public int currentPageNo;
-        //public int nextPage;
-        //public int previousPage;
-        
+                
         public int listTotal;
         public int currentYearTotal;
         public int prevYearTotal;
@@ -61,6 +56,8 @@ namespace PatientTrackingList.Pages
         public bool isCheckedSelected;
         public string prioritySelected;
         public string consultantSelected;
+        public int adminDistrictSelected;
+        public string areaNameSelected;
         public string GCSelected;
         public string commentSearch;
         public string notificationMessage;
@@ -76,7 +73,8 @@ namespace PatientTrackingList.Pages
         [Authorize]
         public void OnGet(string? sNameSearch = null, 
             string? sCGUSearch = null, string? priorityFilter = null, bool? isChecked=false, string? pathwayFilter=null, 
-            string? consultantFilter=null, string? gcFilter=null, string? commentsearch = null, string? triagePathwayFilter = null, string? statusAdmin=null)
+            string? consultantFilter=null, string? gcFilter=null, string? commentsearch = null, string? triagePathwayFilter = null, string? statusAdmin=null, 
+            int? adminDistrict=0)
         {
             try
             {
@@ -125,6 +123,7 @@ namespace PatientTrackingList.Pages
                 .ToList();
                 UniqueTriagePathways = uniqueTriagePathways;
                 listStatusAdmin = _statusAdminData.GetStatusAdminList();
+                listAdminDistricts = _areaNamesData.GetAreaNames();
 
                 //for filtering/searching
                 if (sNameSearch != null)
@@ -195,6 +194,15 @@ namespace PatientTrackingList.Pages
                     adminStatus = statusAdmin;
                 }
 
+                if(adminDistrict != 0)
+                {
+                    string areaName = _areaNamesData.GetAreaNameDetailsByID(adminDistrict.GetValueOrDefault()).AreaName;
+
+                    pageOfPTL = pageOfPTL.Where(p => p.PtAreaName == areaName).ToList();
+                    adminDistrictSelected = adminDistrict.GetValueOrDefault();
+                    areaNameSelected = areaName;
+                }
+
 
             }
             catch (Exception ex)
@@ -205,7 +213,8 @@ namespace PatientTrackingList.Pages
 
         public void OnPost(string? sNameSearch=null, 
             string? sCGUSearch=null, string? priorityFilter = null, bool? isChecked=false, string? pathwayFilter=null, 
-            string? consultantFilter=null, string? gcFilter=null, string? commentsearch=null, string? triagePathwayFilter = null, string? statusAdmin = null)
+            string? consultantFilter=null, string? gcFilter=null, string? commentsearch=null, string? triagePathwayFilter = null, string? statusAdmin = null, 
+            int? adminDistrict = 0)
         {
             try
             {
@@ -216,10 +225,11 @@ namespace PatientTrackingList.Pages
 
                 pageOfPTL = PTL.OrderBy(p => p.ClockStart).ToList();
                 listStatusAdmin = _statusAdminData.GetStatusAdminList();
+                listAdminDistricts = _areaNamesData.GetAreaNames();
 
                 Response.Redirect($"Index?sNameSearch={sNameSearch}&sCGUSearch={sCGUSearch}" +
                     $"&priorityFilter={priorityFilter}&isChecked={isChecked}&pathwayFilter={pathwayFilter}&consultantFilter={consultantFilter}&gcFilter={gcFilter}" +
-                    $"&commentsearch={commentsearch}&triagePathwayFilter={triagePathwayFilter}&statusAdmin={statusAdmin}");
+                    $"&commentsearch={commentsearch}&triagePathwayFilter={triagePathwayFilter}&statusAdmin={statusAdmin}&adminDistrict={adminDistrict}");
             }
             catch (Exception ex)
             {

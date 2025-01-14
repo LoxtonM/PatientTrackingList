@@ -74,8 +74,8 @@ namespace PatientTrackingList.Pages
                 RefDet = _ptlData.GetPTLEntryDetails(id);
                 int refID = RefDet.RefID;
                 var Referral = _activityData.GetActivityDetails(refID);
-                ActivityList = _activityData.GetActivityListByClinicno(Referral.CLINICNO);
-                DiaryList = _diaryData.GetDiaryList(refID);
+                ActivityList = _activityData.GetActivityListByClinicno(Referral.CLINICNO);                
+                DiaryList = _diaryData.GetDiaryListByRefID(refID);
                 LetterList = _letterData.GetLetterList(refID);
 
                 EighteenWeekDate = RefDet.ClockStart.GetValueOrDefault().AddDays(18 * 7);

@@ -5,6 +5,8 @@ using System.Data;
 using ClinicalXPDataConnections.Meta;
 using ClinicalXPDataConnections.Models;
 using ClinicalXPDataConnections.Data;
+//using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Collections.Generic;
 
 
 namespace PatientTrackingList.DataServices
@@ -48,7 +50,11 @@ namespace PatientTrackingList.DataServices
             table.Columns.Add("Status Admin", typeof(string));
             table.Columns.Add("GC Name", typeof(string));
             table.Columns.Add("Consultant Name", typeof(string));
+            table.Columns.Add("Admin Contact", typeof(string));
+            table.Columns.Add("Admin District", typeof(string));
+            table.Columns.Add("Date on Waiting List", typeof(string));
 
+                      
 
             foreach (var ptl in ptlToExport) 
             {
@@ -86,8 +92,10 @@ namespace PatientTrackingList.DataServices
                     ptl.UpdatedBy,
                     ptl.Status_Admin,
                     ptl.ReferralGC,
-                    ptl.ReferralConsultant
-
+                    ptl.ReferralConsultant,
+                    ptl.AdminContact,
+                    ptl.PtAreaName,
+                    ptl.WaitingListDate
                     );
             }
 
@@ -209,7 +217,7 @@ namespace PatientTrackingList.DataServices
         //public async Task<IActionResult> DownloadFile(string filePath)
         public async Task<IActionResult> DownloadFile(string type, string username, string consultantFilter, string gcFilter, string pathwayFilter, 
             string clinicianFilter, string clinicFilter, string statusFilter, string dateTo, string dateFrom, string triagePathwayFilter, 
-            string statusAdmin
+            string statusAdmin, string areaName
             )
         {
             if (type == "ptl")
@@ -242,6 +250,11 @@ namespace PatientTrackingList.DataServices
                 if (statusAdmin != null && statusAdmin != "")
                 {
                     ptlToExport = ptlToExport.Where(p => p.Status_Admin == statusAdmin).ToList();
+                }
+
+                if(areaName != null && areaName != "")
+                {
+                    ptlToExport = ptlToExport.Where(p => p.PtAreaName == areaName).ToList();
                 }
 
                 ExportPTL(ptlToExport, username);
