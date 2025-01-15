@@ -44,5 +44,9 @@ namespace PatientTrackingList.Models
         public DateTime? WaitingListDate { get; set; }
         public string? PtAreaCode { get; set; }
         public string? PtAreaName { get; set; }
+        public string? ConsWLClinician { get; set; }
+        public string? ConsWLClinicianName { get; set; }
+        public string? ConsWLClinic { get; set; }
+        public string? ConsWLClinicName { get; set; }
     }
 }

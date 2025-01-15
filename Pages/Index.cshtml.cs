@@ -17,7 +17,8 @@ namespace PatientTrackingList.Pages
         private readonly INotificationData _notificationData;
         private readonly ISqlServices _sql;
         private readonly IListStatusAdminData _statusAdminData;
-        private readonly IAreaNamesData _areaNamesData;
+        //private readonly IAreaNamesData _areaNamesData;
+        private readonly IClinicVenueData _venueData;
         private readonly DataContext _context;    
         private readonly ClinicalContext _clinicalContext;
         public IndexModel(DataContext context, ClinicalContext clinicalContext, IConfiguration config)
@@ -29,7 +30,8 @@ namespace PatientTrackingList.Pages
             _staffData = new StaffUserData(_clinicalContext);
             _notificationData = new NotificationData(_clinicalContext);
             _statusAdminData = new ListStatusAdminData(_context);
-            _areaNamesData = new AreaNamesData(_clinicalContext);
+            //_areaNamesData = new AreaNamesData(_clinicalContext);
+            _venueData = new ClinicVenueData(_clinicalContext);
             _sql = new SqlServices(_config);
         }
         public IEnumerable<PTL> PTL { get; set; }
@@ -37,7 +39,8 @@ namespace PatientTrackingList.Pages
         public List<StaffMember> GCList { get; set; }
         public List<PTL> pageOfPTL { get; set; }
         public IEnumerable<ListStatusAdmin> listStatusAdmin { get; set; }
-        public IEnumerable<AreaNames> listAdminDistricts { get; set; }
+        //public IEnumerable<AreaNames> listAdminDistricts { get; set; }
+        public IEnumerable<ClinicVenue> clinicVenueList { get; set; }
         public DateTime CurrentYear;
         public DateTime PreviousYear;
         public DateTime EighteenWeekDate;
@@ -56,8 +59,9 @@ namespace PatientTrackingList.Pages
         public bool isCheckedSelected;
         public string prioritySelected;
         public string consultantSelected;
-        public int adminDistrictSelected;
-        public string areaNameSelected;
+        //public int adminDistrictSelected;
+        //public string areaNameSelected;
+        public string clinicCodeSelected;
         public string GCSelected;
         public string commentSearch;
         public string notificationMessage;
@@ -73,8 +77,8 @@ namespace PatientTrackingList.Pages
         [Authorize]
         public void OnGet(string? sNameSearch = null, 
             string? sCGUSearch = null, string? priorityFilter = null, bool? isChecked=false, string? pathwayFilter=null, 
-            string? consultantFilter=null, string? gcFilter=null, string? commentsearch = null, string? triagePathwayFilter = null, string? statusAdmin=null, 
-            int? adminDistrict=0)
+            string? consultantFilter = null, string? gcFilter = null, string? commentsearch = null, string? triagePathwayFilter = null, string? statusAdmin=null, 
+            string? clinicVenue = null)
         {
             try
             {
@@ -99,6 +103,7 @@ namespace PatientTrackingList.Pages
 
                 consultantList = _staffData.GetConsultantsList();
                 GCList = _staffData.GetGCList();
+                clinicVenueList = _venueData.GetVenueList();
 
                 CurrentYear = DateTime.Parse($"{DateTime.Now.Year}-01-01");
                 PreviousYear = DateTime.Parse($"{(DateTime.Now.Year - 1)}-01-01");
@@ -123,7 +128,7 @@ namespace PatientTrackingList.Pages
                 .ToList();
                 UniqueTriagePathways = uniqueTriagePathways;
                 listStatusAdmin = _statusAdminData.GetStatusAdminList();
-                listAdminDistricts = _areaNamesData.GetAreaNames();
+                //listAdminDistricts = _areaNamesData.GetAreaNames();
 
                 //for filtering/searching
                 if (sNameSearch != null)
@@ -194,13 +199,20 @@ namespace PatientTrackingList.Pages
                     adminStatus = statusAdmin;
                 }
 
-                if(adminDistrict != 0)
+                /*if(adminDistrict != 0)
                 {
                     string areaName = _areaNamesData.GetAreaNameDetailsByID(adminDistrict.GetValueOrDefault()).AreaName;
 
                     pageOfPTL = pageOfPTL.Where(p => p.PtAreaName == areaName).ToList();
                     adminDistrictSelected = adminDistrict.GetValueOrDefault();
                     areaNameSelected = areaName;
+                }*/
+
+                if(clinicVenue != null && clinicVenue != "")
+                {
+                    pageOfPTL = pageOfPTL.Where(p => p.ConsWLClinic == clinicVenue).ToList();
+                    _sql.SqlWriteUsageAudit(staffCode, $"ClinicCode={clinicVenue}", "Index", _ip.GetIPAddress());
+                    clinicCodeSelected = clinicVenue;
                 }
 
 
@@ -214,7 +226,7 @@ namespace PatientTrackingList.Pages
         public void OnPost(string? sNameSearch=null, 
             string? sCGUSearch=null, string? priorityFilter = null, bool? isChecked=false, string? pathwayFilter=null, 
             string? consultantFilter=null, string? gcFilter=null, string? commentsearch=null, string? triagePathwayFilter = null, string? statusAdmin = null, 
-            int? adminDistrict = 0)
+            string? clinicVenue = "")
         {
             try
             {
@@ -222,14 +234,14 @@ namespace PatientTrackingList.Pages
 
                 consultantList = _staffData.GetConsultantsList();
                 GCList = _staffData.GetGCList();
-
+                clinicVenueList = _venueData.GetVenueList();
                 pageOfPTL = PTL.OrderBy(p => p.ClockStart).ToList();
                 listStatusAdmin = _statusAdminData.GetStatusAdminList();
-                listAdminDistricts = _areaNamesData.GetAreaNames();
+                //listAdminDistricts = _areaNamesData.GetAreaNames();
 
                 Response.Redirect($"Index?sNameSearch={sNameSearch}&sCGUSearch={sCGUSearch}" +
                     $"&priorityFilter={priorityFilter}&isChecked={isChecked}&pathwayFilter={pathwayFilter}&consultantFilter={consultantFilter}&gcFilter={gcFilter}" +
-                    $"&commentsearch={commentsearch}&triagePathwayFilter={triagePathwayFilter}&statusAdmin={statusAdmin}&adminDistrict={adminDistrict}");
+                    $"&commentsearch={commentsearch}&triagePathwayFilter={triagePathwayFilter}&statusAdmin={statusAdmin}&clinicVenue={clinicVenue}");
             }
             catch (Exception ex)
             {

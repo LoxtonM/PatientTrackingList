@@ -12,7 +12,7 @@
                asp-page="/Download" asp-route-consultantFilter=@Model.consultantSelected
                asp-route-gcFilter=@Model.GCSelected asp-route-pathwayFilter=@Model.pathwaySelected
                asp-route-username=@Model.User.Identity.Name asp-route-type="ptl" asp-route-triagePathwayFilter="@Model.triagePathway"
-               asp-route-statusAdmin="@Model.adminStatus" asp-route-areaName="@Model.areaNameSelected">Export Data</a>
+               asp-route-statusAdmin="@Model.adminStatus" asp-route-clinicVenue="@Model.clinicCodeSelected">Export Data</a>
         </div>
     </div>
     @if (!Model.isLive)
@@ -205,12 +205,12 @@
                                 </select>
                             </div>
                             <div class="col mb-3">
-                                <label class="form-label" for="ddladminDistrict">Admin District:</label>
-                                <select id="ddladminDistrict" class="form-select" asp-for=@Model.adminDistrictSelected name="adminDistrict">
+                                <label class="form-label" for="ddladminDistrict">Waiting List Clinic:</label>
+                                <select id="ddladminDistrict" class="form-select" asp-for=@Model.clinicCodeSelected name="clinicVenue">
                                     <option value="" defaultValue>Select...</option>
-                                    @foreach (var item in Model.listAdminDistricts)
+                                    @foreach (var item in Model.clinicVenueList)
                                     {
-                                        <option value="@item.AreaID">@item.AreaName - @item.AreaCode</option>
+                                        <option value="@item.FACILITY">@item.FACILITY - @item.NAME</option>
                                     }
                                 </select>
                             </div>
