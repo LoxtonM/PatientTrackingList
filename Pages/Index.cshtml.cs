@@ -109,7 +109,7 @@ namespace PatientTrackingList.Pages
                 PreviousYear = DateTime.Parse($"{(DateTime.Now.Year - 1)}-01-01");
                 EighteenWeekDate = DateTime.Now.AddDays(-18 * 7);
                 FiftyTwoWeekDate = DateTime.Now.AddDays(-365);
-                
+                listStatusAdmin = _statusAdminData.GetStatusAdminList();
 
                 pageOfPTL = PTL.OrderBy(p => p.ClockStart).ToList(); //converting to list here makes it much faster!
                 

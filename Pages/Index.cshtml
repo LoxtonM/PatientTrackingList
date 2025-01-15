@@ -205,7 +205,7 @@
                                 </select>
                             </div>
                             <div class="col mb-3">
-                                <label class="form-label" for="ddladminDistrict">Waiting List Clinic:</label>
+                                <label class="form-label" for="ddladminDistrict">Triage Clinic:</label>
                                 <select id="ddladminDistrict" class="form-select" asp-for=@Model.clinicCodeSelected name="clinicVenue">
                                     <option value="" defaultValue>Select...</option>
                                     @foreach (var item in Model.clinicVenueList)
@@ -237,10 +237,11 @@
                                     <th>Reason</th>
                                     <th>Urgency</th>
                                     <th>TCI Date</th>
-                                    <th>Clock Ticking (Days)</th>
+                                    @*<th>Clock Ticking (Days)</th>*@
                                     <th>Clock Ticking (Weeks)</th>
                                     <th>Clock Weeks at TCI</th>
                                     <th>Triage Pathway</th>
+                                    <th>Triage Clinic Code</th>
                                     <th>Admin Contact</th>
                                     <th>Comments</th>
                                     <th>Date on Waiting List</th>
@@ -286,10 +287,11 @@
                                             {
                                                 <td class="text-danger">N/A</td>
                                             }
-                                            @if (p.ClockStart.HasValue)
+                                            @*@if (p.ClockStart.HasValue)
                                             {
                                                 <td class="text-danger">@((DateTime.Now - @p.ClockStart).Value.ToString("dd"))</td>
-                                            }
+                                            }*@
+
                                             @if (p.ClockStart.HasValue)
                                             {
                                                 <td class="text-danger">@Math.Floor(((DateTime.Now - @p.ClockStart).Value / 7).TotalDays)</td>
@@ -304,6 +306,7 @@
                                                 <td class="text-danger">N/A</td>
                                             }
                                             <td class="text-danger">@p.TriagePathway</td>
+                                            <td class="text-danger">@p.ConsWLClinic</td>
                                             <td class="text-danger">@p.AdminContact</td>
                                             <td class="text-danger">@p.Comments</td>
                                             @if(p.WaitingListDate != null)
@@ -366,10 +369,10 @@
                                             {
                                                 <td class="text-warning">N/A</td>
                                             }
-                                            @if (p.ClockStart.HasValue)
+                                            @*@if (p.ClockStart.HasValue)
                                             {
                                                 <td class="text-warning">@((DateTime.Now - @p.ClockStart).Value.ToString("dd"))</td>
-                                            }
+                                            }*@
                                             @if (p.ClockStart.HasValue)
                                             {
                                                 <td class="text-warning">@Math.Floor(((DateTime.Now - @p.ClockStart).Value / 7).TotalDays)</td>
@@ -383,6 +386,7 @@
                                                 <td class="text-warning">N/A</td>
                                             }
                                             <td class="text-warning">@p.TriagePathway</td>
+                                            <td class="text-warning">@p.ConsWLClinic</td>
                                             <td class="text-warning">@p.AdminContact</td>
                                             <td class="text-warning">@p.Comments</td>
                                             @if (p.WaitingListDate != null)
@@ -445,10 +449,10 @@
                                             {
                                                 <td>N/A</td>
                                             }
-                                            @if (p.ClockStart.HasValue)
+                                            @*@if (p.ClockStart.HasValue)
                                             {
                                                 <td>@((DateTime.Now - @p.ClockStart).Value.ToString("dd"))</td>
-                                            }
+                                            }*@
                                             @if (p.ClockStart.HasValue)
                                             {
                                                 <td>@Math.Floor(((DateTime.Now - @p.ClockStart).Value / 7).TotalDays)</td>
@@ -462,6 +466,7 @@
                                                 <td>N/A</td>
                                             }
                                             <td>@p.TriagePathway</td>
+                                            <td>@p.ConsWLClinic</td>
                                             <td>@p.AdminContact</td>
                                             <td>@p.Comments</td>
                                             @if (p.WaitingListDate != null)

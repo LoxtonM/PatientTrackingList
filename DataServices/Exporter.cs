@@ -51,7 +51,7 @@ namespace PatientTrackingList.DataServices
             table.Columns.Add("GC Name", typeof(string));
             table.Columns.Add("Consultant Name", typeof(string));
             table.Columns.Add("Admin Contact", typeof(string));
-            table.Columns.Add("Admin District", typeof(string));
+            table.Columns.Add("Waiting List Clinic", typeof(string));
             table.Columns.Add("Date on Waiting List", typeof(string));
 
                       
@@ -94,7 +94,7 @@ namespace PatientTrackingList.DataServices
                     ptl.ReferralGC,
                     ptl.ReferralConsultant,
                     ptl.AdminContact,
-                    ptl.PtAreaName,
+                    ptl.ConsWLClinic,
                     ptl.WaitingListDate
                     );
             }
@@ -217,7 +217,7 @@ namespace PatientTrackingList.DataServices
         //public async Task<IActionResult> DownloadFile(string filePath)
         public async Task<IActionResult> DownloadFile(string type, string username, string consultantFilter, string gcFilter, string pathwayFilter, 
             string clinicianFilter, string clinicFilter, string statusFilter, string dateTo, string dateFrom, string triagePathwayFilter, 
-            string statusAdmin, string areaName
+            string statusAdmin, string clinicVenue
             )
         {
             if (type == "ptl")
@@ -252,9 +252,9 @@ namespace PatientTrackingList.DataServices
                     ptlToExport = ptlToExport.Where(p => p.Status_Admin == statusAdmin).ToList();
                 }
 
-                if(areaName != null && areaName != "")
+                if(clinicVenue != null && clinicVenue != "")
                 {
-                    ptlToExport = ptlToExport.Where(p => p.PtAreaName == areaName).ToList();
+                    ptlToExport = ptlToExport.Where(p => p.ConsWLClinic == clinicVenue).ToList();
                 }
 
                 ExportPTL(ptlToExport, username);
